@@ -1,4 +1,4 @@
-# reseptiblogi-projekti
+# Reseptiblogi-projekti
 
 ## Suunnitelma ##
 
