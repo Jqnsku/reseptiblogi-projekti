@@ -53,6 +53,36 @@ app.get('/recipes', async (request, response) => {
     response.json(data);
 })
 
+app.get('/comments', async (request, response) => {
+
+    const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+
+    if (error) {
+        console.error('Error fetching users:', error);
+        return response.status(500).json({ error: 'Database error' });
+    }
+
+    response.json(data);
+})
+
+app.post('/comments', async (request, response) => {
+    const { recipe_id, user_id, content } = request.params
+
+    const { data, error } = await supabase
+        .from('comments')
+        .insert([{ recipe_id, user_id, content }])
+        .select('*')
+
+    if (error) {
+        console.error('Error adding comments:', error);
+        return response.status(500).json({ error: 'Database error' });
+    }
+
+    response.json(data);
+})
+
 app.get('/user', async (request, response) => {
 
     const { data, error } = await supabase
