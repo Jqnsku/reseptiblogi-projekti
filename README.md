@@ -1,5 +1,5 @@
-# reseptiblogi-projekti
-
+# Reseptiblogi-projekti
+#### Figmalla suunniteltu sivu: https://www.figma.com/make/SnmEcbYHn2yckSJZCMvROw/Recipe-Blog-App?p=f ####
 ## Suunnitelma ##
 
 Selkeä reseptiblogi, jossa käyttäjät voivat:
