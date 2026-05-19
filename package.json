@@ -1,0 +1,29 @@
+{
+  "name": "reseptiblogi-projekti",
+  "version": "1.0.0",
+  "description": "Selkeä reseptiblogi, jossa käyttäjät voivat:\r - selata uusimpia reseptejä etusivulla\r - hakupalkki, jolla voi hakea reseptiä nimellä\r - Käyttäjät voivat jakaa reseptejään\r - avata yksittäisen reseptin omalle sivulleen\r - kirjautua sisään kommentoidakseen\r - käyttää sivua myös ilman kirjautumista vierailijana",
+  "homepage": "https://github.com/Jqnsku/reseptiblogi-projekti#readme",
+  "bugs": {
+    "url": "https://github.com/Jqnsku/reseptiblogi-projekti/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jqnsku/reseptiblogi-projekti.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.106.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1"
+  }
+}
