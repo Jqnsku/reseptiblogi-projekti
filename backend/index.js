@@ -47,7 +47,7 @@ app.get('/recipes/:title', async (request, response) => {
 })
 
 app.post('/recipes', authenticateToken, async (request, response) => {
-    const { recipe_id, title, description, instructions, image_ur } = request.body
+    const { recipe_id, title, description, instructions, image_url } = request.body
 
     const user_id = request.user.user_id
 
@@ -58,7 +58,7 @@ app.post('/recipes', authenticateToken, async (request, response) => {
             title,
             description,
             instructions,
-            image_ur,
+            image_url,
             user_id
         }])
         .select('*')
