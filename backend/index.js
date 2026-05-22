@@ -54,6 +54,7 @@ app.get('/recipes', async (request, response) => {
 })
 
 app.get('/recipe/:recipe_id', async (request, response) => {
+    const { recipe_id } = request.params
 
     const { data, error } = await supabase
         .from('recipes')
