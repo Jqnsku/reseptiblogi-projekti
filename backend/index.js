@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const { supabase } = require('./database.js')
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 
 app.use(express.json())
 app.use(cors())
@@ -54,6 +55,7 @@ app.get('/recipes', async (request, response) => {
 })
 
 app.get('/recipe/:recipe_id', async (request, response) => {
+    const { recipe_id } = request.params
 
     const { data, error } = await supabase
         .from('recipes')
@@ -170,30 +172,38 @@ app.post('/login', async (request, response) => {
         return response.status(401).json({ error: 'Wrong password' })
     }
 
+    const token = jwt.sign(
+        {
+            user_id: user.user_id,
+            username: user.username
+        }, process.env.SECRET)
+
     return response.status(200).json({
-        message: 'Login successful',
+        message: 'Login succesfull',
+        token,
         user: {
             user_id: user.user_id,
             username: user.username
         }
     })
+})
 
-      app.post('/guest', async (request, response) => {
+
+app.post('/guest', async (request, response) => {
     const guestUser = {
-      user_id: Date.now(),
-      username: 'guest',
-      xp: 0,
-      isGuest: 'true'
+        user_id: Date.now(),
+        username: 'guest',
+        xp: 0,
+        isGuest: true
     }
 
     return response.status(200).json({
-      message: 'Guest login successful',
-      user: guestUser
+        message: 'Guest login successful',
+        user: guestUser
     })
-  })
 })
 
-    const PORT = 3001
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`)
-    })
+const PORT = 3001
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`)
+})
