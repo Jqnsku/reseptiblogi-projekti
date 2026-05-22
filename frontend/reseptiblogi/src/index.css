@@ -1,0 +1,199 @@
+.sivu {
+    padding: 15px 30px;
+}
+
+.yläpalkki {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: 20px;
+
+    border-bottom: 1px solid #DDD;
+    background-color: white;
+}
+
+.hakupalkki {
+    width: 100%;
+    max-width: 400px;
+    height: 40px;
+    padding: 0 12px;
+    font-size: 16px;
+    border-radius: 10px;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.logon-sijainti {
+    flex: 1;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.nappi-sijainti {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.napit,
+.käyttäjä {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.ks-nappi {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font-size: 16px;
+    color: black;
+    /* tai haluamasi väri */
+}
+
+.re-nappi {
+    background-color: #4f46e5;
+    color: white;
+
+    border: none;
+    border-radius: 10px;
+
+    padding: 10px 18px;
+    font-size: 16px;
+
+    cursor: pointer;
+}
+
+.tietoa {
+    padding-bottom: 20px;
+}
+
+.kuvat {
+    /* display: flex;
+    flex-direction: row;
+    height: 150px;
+    width: 200px; */
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.otsikkoKuvaus {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.modal {
+  background: white;
+  width: 400px;
+  max-width: 90%;
+
+  padding: 1.5rem;
+  border-radius: 12px;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+
+  animation: pop 0.2s ease;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.6);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 1000;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-bottom: 1rem;
+}
+
+.x-nappi {
+  border: none;
+  background: none;
+
+  font-size: 20px;
+  cursor: pointer;
+
+  padding: 4px;
+  line-height: 1;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+
+  margin: 6px 0;
+
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  padding: 10px 14px;
+
+  border: none;
+  border-radius: 20px;
+
+  background: #4f46e5;
+  color: rgb(0, 0, 0);
+
+  cursor: pointer;
+}
+
+.form-napit {
+    width: 100%;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.kaikkiReseptit {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    gap: 50px;
+    align-items: center;
+}
+
+.kaikkiTiedot {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-color: rgb(255, 255, 255, 0.4);
+    padding: 20px;
+}
+
+.resepti {
+    /* display: flex;
+    flex-direction: row;
+    flex: 1 1 250px; */
+    border: 1px solid #CCC;
+    padding: 10px;
+    cursor: pointer;
+}
+
+.reseptit {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
