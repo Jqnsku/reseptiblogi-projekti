@@ -8,6 +8,28 @@ const jwt = require('jsonwebtoken')
 app.use(express.json())
 app.use(cors())
 
+const authenticateToken = (request, response, next) => {
+    const authHeader = request.headers.authorization
+
+    if (!authHeader) {
+        return response.status(401).json({
+            error: 'Voit kommentoida kirjautumalla sisään'
+        })
+    }
+
+    const token = authHeader.split(' ')[1]
+
+    jwt.verify(token, process.env.SECRET, (error, user) => {
+        if (error) {
+            return response.status(403).json({
+                error: 'Invalid token'
+            })
+        }
+        request.user = user
+        next()
+    })
+}
+
 app.get('/recipes/:title', async (request, response) => {
     const { title } = request.params
 
@@ -24,12 +46,21 @@ app.get('/recipes/:title', async (request, response) => {
     response.json(data);
 })
 
-app.post('/recipes', async (request, response) => {
-    const { recipe_id, title, description, instructions, image_ur, user_id } = request.params
+app.post('/recipes', authenticateToken, async (request, response) => {
+    const { recipe_id, title, description, instructions, image_ur } = request.body
+
+    const user_id = request.user.user_id
 
     const { data, error } = await supabase
         .from('recipes')
-        .insert([{ recipe_id, title, description, instructions, image_ur, user_id }])
+        .insert([{
+            recipe_id,
+            title,
+            description,
+            instructions,
+            image_ur,
+            user_id
+        }])
         .select('*')
 
     if (error) {
@@ -85,8 +116,10 @@ app.get('/comments', async (request, response) => {
     response.json(data);
 })
 
-app.post('/comments', async (request, response) => {
-    const { recipe_id, user_id, content } = request.params
+app.post('/comments', authenticateToken, async (request, response) => {
+    const { recipe_id, content } = request.body
+
+    const user_id = request.user.user_id
 
     const { data, error } = await supabase
         .from('comments')
@@ -100,6 +133,22 @@ app.post('/comments', async (request, response) => {
 
     response.json(data);
 })
+
+// app.post('/comments', async (request, response) => {
+//     const { recipe_id, user_id, content } = request.params
+
+//     const { data, error } = await supabase
+//         .from('comments')
+//         .insert([{ recipe_id, user_id, content }])
+//         .select('*')
+
+//     if (error) {
+//         console.error('Error adding comments:', error);
+//         return response.status(500).json({ error: 'Database error' });
+//     }
+
+//     response.json(data);
+// })
 
 app.get('/user', async (request, response) => {
 
