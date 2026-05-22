@@ -53,6 +53,22 @@ app.get('/recipes', async (request, response) => {
     response.json(data);
 })
 
+app.get('/recipe/:recipe_id', async (request, response) => {
+
+    const { data, error } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('recipe_id', recipe_id)
+
+    if (error) {
+        console.error('Error fetching recipes:', error);
+        return response.status(500).json({ error: 'Database error' });
+    }
+
+    response.json(data);
+})
+
+
 app.get('/comments', async (request, response) => {
 
     const { data, error } = await supabase
