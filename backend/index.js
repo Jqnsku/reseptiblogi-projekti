@@ -137,6 +137,23 @@ app.get('/comments', async (request, response) => {
     response.json(data);
 })
 
+app.get('/comments/:id', async (request, response) => {
+
+    const { data, error } = await supabase
+        .from('comments')
+        .select(`
+    *,
+    user:user_id(username)
+`)
+
+    if (error) {
+        console.error('Error fetching users:', error);
+        return response.status(500).json({ error: 'Database error' });
+    }
+
+    response.json(data);
+})
+
 app.post('/comments', authenticateToken, async (request, response) => {
     const { recipe_id, content } = request.body
 
