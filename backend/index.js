@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken')
 app.use(express.json())
 app.use(cors())
 
+
 if (!process.env.SECRET) {
     throw new Error('SECRET missing')
 }
