@@ -55,32 +55,33 @@ const SignupForm = ({ handleSignup, newUsername, newEmail, newPassword, handleNu
 }
 
 const NewRecipeForm = ({ addRecipe, newTitle, newDescription, newIngredients, newInstructions, newImage,
-handleTitleChange, handleDescriptionChange, handleIngredientsChange, handleInstructionChange,
-handleImageChange
+  handleTitleChange, handleDescriptionChange, handleIngredientsChange, handleInstructionChange,
+  handleImageChange
 }) => {
   return (
     <form onSubmit={addRecipe}>
       <div>
-      Otsikko: <input value={newTitle} onChange={handleTitleChange} />
+        Otsikko: <input value={newTitle} onChange={handleTitleChange} />
       </div>
-    <div>
-      Kuvaus: <input value={newDescription} onChange={handleDescriptionChange} />
-    </div>
-    <div>
-      Ainekset: <input value={newIngredients} onChange={handleIngredientsChange} />
-    </div>
-       <div>
-      Ohjeet: <input value={newInstructions} onChange={handleIngredientsChange} />
-    </div>
-    <div>
-      Kuva: <input value={newImage}  onChange={handleImageChange}/>
-    </div>
-    <button type='submit'> Lisää </button>
+      <div>
+        Kuvaus: <input value={newDescription} onChange={handleDescriptionChange} />
+      </div>
+      <div>
+        Ainekset: <input value={newIngredients} onChange={handleIngredientsChange} />
+      </div>
+      <div>
+        Ohjeet: <input value={newInstructions} onChange={handleIngredientsChange} />
+      </div>
+      <div>
+        Kuva: <input value={newImage} onChange={handleImageChange} />
+      </div>
+      <button type='submit'> Lisää </button>
     </form>
   )
 }
 
 function App() {
+
   const [recipes, setRecipes] = useState([])
 
   const [isLogged, setIsLogged] = useState(false)
@@ -115,13 +116,6 @@ function App() {
       })
   }, [])
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:3001/recipes/${recipes.recipe_id}`)
-      .then(response => {
-        setRecipes(response.data)
-      })
-  }, [])
 
   useEffect(() => {
     axios
@@ -149,7 +143,7 @@ function App() {
       })
       .then(response => {
         setUser(response.data.user)
-        
+
         setIsLogged(true)
 
         setUsername('')
@@ -186,7 +180,7 @@ function App() {
       })
   }
 
-   const login = () => {
+  const login = () => {
     setUser({ username: username })
     setUsername('')
     setPassword('')
@@ -211,10 +205,12 @@ function App() {
   const handleInstructionChange = (event) => setNewInstructions(event.target.value)
   const handleImageChange = (event) => setNewImage(event.target.value)
 
-const addRecipe = (event) => {
+  const addRecipe = (event) => {
     event.preventDefault()
-    const newRecipeObject = { title: newTitle, description: newDescription,
-      ingredients: newIngredients, instructions: newInstructions, image_url: newImage }
+    const newRecipeObject = {
+      title: newTitle, description: newDescription,
+      ingredients: newIngredients, instructions: newInstructions, image_url: newImage
+    }
 
 
     axios
@@ -266,24 +262,24 @@ const addRecipe = (event) => {
         </div>
       </header>
 
-          {isLogged && (
-              <>
-                <h4> Lisää uusi resepti </h4>
-                <NewRecipeForm
-                addRecipe={addRecipe}
-                newTitle={newTitle}
-                newDescription={newDescription}
-                newIngredients={newIngredients}
-                newInstructions={newInstructions}
-                newImage={newImage}
-                handleTitleChange={handleTitleChange}
-                handleDescriptionChange={handleDescriptionChange}
-                handleIngredientsChange={handleIngredientsChange}
-                handleInstructionChange={handleInstructionChange}
-                handleImageChange={handleImageChange}
-                />
-              </>
-            )}
+      {isLogged && (
+        <>
+          <h4> Lisää uusi resepti </h4>
+          <NewRecipeForm
+            addRecipe={addRecipe}
+            newTitle={newTitle}
+            newDescription={newDescription}
+            newIngredients={newIngredients}
+            newInstructions={newInstructions}
+            newImage={newImage}
+            handleTitleChange={handleTitleChange}
+            handleDescriptionChange={handleDescriptionChange}
+            handleIngredientsChange={handleIngredientsChange}
+            handleInstructionChange={handleInstructionChange}
+            handleImageChange={handleImageChange}
+          />
+        </>
+      )}
 
       {!isLogged && showForm && (
         <div className='modal-overlay' onClick={() => setShowForm(null)}>
