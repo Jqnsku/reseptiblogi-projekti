@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import { Routes, Route, useNavigate, useParams } from 'react-router-dom'
+import KotiSivu from './pages/KotiSivu'
+import YksiSivu from './pages/YksiSivu'
 
 // handleSearchSubmit <form onSubmit={handleSearchSubmit}>
-const SearchForm = ({ search, handleSearchChange }) => {
-  return (
-    <input
-      className='hakupalkki'
-      value={search}
-      onChange={handleSearchChange}
-      placeholder='Hae resepti nimellä...'
-    />
-  )
-}
+// const SearchForm = ({ search, handleSearchChange }) => {
+//   return (
+//     <input
+//       className='hakupalkki'
+//       value={search}
+//       onChange={handleSearchChange}
+//       placeholder='Hae resepti nimellä...'
+//     />
+//   )
+// }
 
 const LoginForm = ({ handleLogin, username, password, handleUnChange, handlePwChange, setShowForm }) => {
   return (
@@ -24,6 +27,8 @@ const LoginForm = ({ handleLogin, username, password, handleUnChange, handlePwCh
         Salasana: <input type='password' value={password} onChange={handlePwChange} />
       </div>
       <button className='form-napit' type='submit'> Kirjaudu sisään </button>
+      <button className='form-napit2' type='button' onClick={() =>
+        setShowForm("register")}> Ei ole käyttäjää? Luo käyttäjä </button>
     </form>
   )
 }
@@ -43,6 +48,34 @@ const SignupForm = ({ handleSignup, newUsername, newEmail, newPassword, handleNu
         Salasana: <input type='password' value={newPassword} onChange={handleNpChange} />
       </div>
       <button className='form-napit' type='submit'> Rekisteröidy </button>
+      <button className='form-napit2' type='button' onClick={() =>
+        setShowForm("login")}> Onko sinulla tili? Kirjaudu </button>
+    </form>
+  )
+}
+
+const NewRecipeForm = ({ addRecipe, newTitle, newDescription, newIngredients, newInstructions, newImage,
+handleTitleChange, handleDescriptionChange, handleIngredientsChange, handleInstructionChange,
+handleImageChange
+}) => {
+  return (
+    <form onSubmit={addRecipe}>
+      <div>
+      Otsikko: <input value={newTitle} onChange={handleTitleChange} />
+      </div>
+    <div>
+      Kuvaus: <input value={newDescription} onChange={handleDescriptionChange} />
+    </div>
+    <div>
+      Ainekset: <input value={newIngredients} onChange={handleIngredientsChange} />
+    </div>
+       <div>
+      Ohjeet: <input value={newInstructions} onChange={handleIngredientsChange} />
+    </div>
+    <div>
+      Kuva: <input value={newImage}  onChange={handleImageChange}/>
+    </div>
+    <button type='submit'> Lisää </button>
     </form>
   )
 }
@@ -51,8 +84,6 @@ function App() {
   const [recipes, setRecipes] = useState([])
 
   const [isLogged, setIsLogged] = useState(false)
-
-  const [comments, setComments] = useState([])
 
   const [user, setUser] = useState(null)
   const [showForm, setShowForm] = useState(null)
@@ -68,11 +99,25 @@ function App() {
   const [newEmail, setNewEmail] = useState('')
   const [newPassword, setNewPassword] = useState('')
 
+  const [newTitle, setNewTitle] = useState('')
+  const [newDescription, setNewDescription] = useState('')
+  const [newIngredients, setNewIngredients] = useState('')
+  const [newInstructions, setNewInstructions] = useState('')
+  const [newImage, setNewImage] = useState('')
+
   const [search, setSearch] = useState('')
 
   useEffect(() => {
     axios
       .get('http://localhost:3001/recipes')
+      .then(response => {
+        setRecipes(response.data)
+      })
+  }, [])
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:3001/recipes/${recipes.recipe_id}`)
       .then(response => {
         setRecipes(response.data)
       })
@@ -86,13 +131,13 @@ function App() {
       })
   }, [])
 
-  useEffect(() => {
-    axios
-      .get('http://localhost:3001/comments')
-      .then(response => {
-        setComments(response.data)
-      })
-  }, [])
+  // useEffect(() => {
+  //   axios
+  //     .get('http://localhost:3001/comments')
+  //     .then(response => {
+  //       setComments(response.data)
+  //     })
+  // }, [])
 
   const handleLogin = (event) => {
     event.preventDefault()
@@ -104,6 +149,7 @@ function App() {
       })
       .then(response => {
         setUser(response.data.user)
+        
         setIsLogged(true)
 
         setUsername('')
@@ -140,6 +186,12 @@ function App() {
       })
   }
 
+   const login = () => {
+    setUser({ username: username })
+    setUsername('')
+    setPassword('')
+  }
+
   const logout = () => {
     setUser(null)
     setIsLogged(false)
@@ -153,11 +205,29 @@ function App() {
   const handleNeChange = (event) => setNewEmail(event.target.value)
   const handleNpChange = (event) => setNewPassword(event.target.value)
 
-  const handleSearchChange = (event) => setSearch(event.target.value)
+  const handleTitleChange = (event) => setNewTitle(event.target.value)
+  const handleDescriptionChange = (event) => setNewDescription(event.target.value)
+  const handleIngredientsChange = (event) => setNewIngredients(event.target.value)
+  const handleInstructionChange = (event) => setNewInstructions(event.target.value)
+  const handleImageChange = (event) => setNewImage(event.target.value)
 
-  const filtered = recipes.filter(recipe =>
-    recipe.title?.toLowerCase().includes(search.toLowerCase())
-  )
+const addRecipe = (event) => {
+    event.preventDefault()
+    const newRecipeObject = { title: newTitle, description: newDescription,
+      ingredients: newIngredients, instructions: newInstructions, image_url: newImage }
+
+
+    axios
+      .post('http://localhost:3001/recipe', newRecipeObject)
+      .then(response => {
+        setRecipes(prev => [...prev, response.data])
+        setNewTitle('')
+        setNewDescription('')
+        setNewIngredients('')
+        setNewInstructions('')
+        setNewImage('')
+      })
+  }
 
   return (
     <div className='sivu'>
@@ -196,6 +266,24 @@ function App() {
         </div>
       </header>
 
+          {isLogged && (
+              <>
+                <h4> Lisää uusi resepti </h4>
+                <NewRecipeForm
+                addRecipe={addRecipe}
+                newTitle={newTitle}
+                newDescription={newDescription}
+                newIngredients={newIngredients}
+                newInstructions={newInstructions}
+                newImage={newImage}
+                handleTitleChange={handleTitleChange}
+                handleDescriptionChange={handleDescriptionChange}
+                handleIngredientsChange={handleIngredientsChange}
+                handleInstructionChange={handleInstructionChange}
+                handleImageChange={handleImageChange}
+                />
+              </>
+            )}
 
       {!isLogged && showForm && (
         <div className='modal-overlay' onClick={() => setShowForm(null)}>
@@ -210,89 +298,48 @@ function App() {
               <button className='x-nappi' onClick={() => setShowForm(null)}>
                 X
               </button>
-              </div>
-
-              {showForm === "login" && (
-                <div className='kirjautuminen'>
-                  <LoginForm
-                    setShowForm={setShowForm}
-                    handleLogin={handleLogin}
-                    username={username}
-                    password={password}
-                    handleUnChange={handleUnChange}
-                    handlePwChange={handlePwChange} />
-                </div>
-              )}
-
-              {showForm === "register" && (
-                <div className='rekisteröityminen'>
-                  <SignupForm
-                    setShowForm={setShowForm}
-                    handleSignup={handleSignup}
-                    newUsername={newUsername}
-                    newEmail={newEmail}
-                    newPassword={newPassword}
-                    handleNuChange={handleNuChange}
-                    handleNeChange={handleNeChange}
-                    handleNpChange={handleNpChange} />
-                </div>
-              )}
-
             </div>
+
+            {showForm === "login" && (
+              <div className='kirjautuminen'>
+                <LoginForm
+                  setShowForm={setShowForm}
+                  handleLogin={handleLogin}
+                  username={username}
+                  password={password}
+                  handleUnChange={handleUnChange}
+                  handlePwChange={handlePwChange} />
+              </div>
+            )}
+
+            {showForm === "register" && (
+              <div className='rekisteröityminen'>
+                <SignupForm
+                  setShowForm={setShowForm}
+                  handleSignup={handleSignup}
+                  newUsername={newUsername}
+                  newEmail={newEmail}
+                  newPassword={newPassword}
+                  handleNuChange={handleNuChange}
+                  handleNeChange={handleNeChange}
+                  handleNpChange={handleNpChange} />
+              </div>
+            )}
           </div>
+        </div>
       )}
 
-          <div className='tietoa'>
-            <h2> Viimeisimmät reseptit </h2>
-            <p> Löydä herkullisia reseptejä, joita yhteisömme on jakanut </p>
 
-            <SearchForm
-              search={search}
-              handleSearchChange={handleSearchChange}
-            />
-          </div>
+      <Routes>
+        <Route path='/'
+          element={<KotiSivu recipes={recipes} />} />
 
-          <div className='reseptit'>
-            {filtered.map(recipe => (
-              <div className='resepti' key={recipe.recipe_id}>
-                {/* {recipe.title}  */}
-                <div className='kaikkiReseptit'>
+        <Route path='/recipe/:id'
+          element={<YksiSivu recipes={recipes} />} />
+      </Routes>
 
-                  <img className="kuvat"
-                    src={recipe.image_url}
-                    alt={recipe.title} />
+    </div>
+  )
+}
 
-                  <div className='otsikkoKuvaus'>
-                    <p> {recipe.title}</p>
-                    <p> {recipe.description}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* <div className='reseptit'>
-        {recipes.map(recipe => (
-          <div className='resepti' key={recipe.recipe_id}>
-
-            <div className='kaikkiReseptit'>
-
-              <img className="kuvat"
-                src={recipe.image_url}
-                alt={recipe.title} />
-
-              <div className='otsikkoKuvaus'>
-                <p> {recipe.title}</p>
-                <p> {recipe.description}</p>
-              </div>
-
-            </div>
-          </div>
-        ))}
-      </div> */}
-
-        </div>
-      )
-      }
-
-      export default App
+export default App

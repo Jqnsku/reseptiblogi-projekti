@@ -70,10 +70,6 @@
     cursor: pointer;
 }
 
-.tietoa {
-    padding-bottom: 20px;
-}
-
 .kuvat {
     /* display: flex;
     flex-direction: row;
@@ -84,6 +80,10 @@
     object-fit: cover;
 }
 
+.otsikko {
+    font-weight: bold;
+}
+
 .otsikkoKuvaus {
     display: flex;
     flex-direction: column;
@@ -91,86 +91,93 @@
 }
 
 .modal {
-  background: white;
-  width: 400px;
-  max-width: 90%;
+    background: white;
+    width: 400px;
+    max-width: 90%;
 
-  padding: 1.5rem;
-  border-radius: 12px;
+    padding: 1.5rem;
+    border-radius: 12px;
 
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 
-  animation: pop 0.2s ease;
+    animation: pop 0.2s ease;
 }
 
 .modal-overlay {
-  position: fixed;
-  inset: 0;
+    position: fixed;
+    inset: 0;
 
-  background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.6);
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-  z-index: 1000;
+    z-index: 1000;
 }
 
 .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-  margin-bottom: 1rem;
+    margin-bottom: 1rem;
 }
 
 .x-nappi {
-  border: none;
-  background: none;
+    border: none;
+    background: none;
 
-  font-size: 20px;
-  cursor: pointer;
+    font-size: 20px;
+    cursor: pointer;
 
-  padding: 4px;
-  line-height: 1;
+    padding: 4px;
+    line-height: 1;
 }
 
 input {
-  width: 100%;
-  padding: 10px;
+    width: 100%;
+    padding: 10px;
 
-  margin: 6px 0;
+    margin: 6px 0;
 
-  border: 1px solid #ccc;
-  border-radius: 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
 }
 
 button {
-  padding: 10px 14px;
+    padding: 10px 14px;
 
-  border: none;
-  border-radius: 20px;
+    border: none;
+    border-radius: 20px;
 
-  background: #4f46e5;
-  color: rgb(0, 0, 0);
+    background: #4f46e5;
+    color: rgb(0, 0, 0);
 
-  cursor: pointer;
+    cursor: pointer;
 }
 
 .form-napit {
     width: 100%;
 }
 
+.form-napit2 {
+    background-color: #ffffff;
+    color: #120b97;
+    border: none;
+    justify-content: center;
+    width: 100%;
+}
+
 button:hover {
-  opacity: 0.9;
+    opacity: 0.9;
 }
 
 .kaikkiReseptit {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
-    justify-content: center;
-    gap: 50px;
+    /* justify-content: center; */
     align-items: center;
 }
 
@@ -196,4 +203,36 @@ button:hover {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 20px;
+    padding-top: 20px;
+}
+
+.aineksetOhjeet {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    white-space: pre-line;
+}
+
+.yksisivu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 800px;
+    max-width: 90%;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.kokoSivu {
+    justify-self: center;
+    align-items: center;
+    height: 100%;
+    padding: 20px 200px;
+    margin: 0;
+    flex-direction: column;
+    background-size: cover;
+    border: none;
+    border-radius: 1%;
 }
