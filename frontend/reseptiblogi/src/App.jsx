@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import { Routes, Route, useNavigate, useParams } from 'react-router-dom'
+import { Routes, Route, useNavigate, useParams, Link } from 'react-router-dom'
 import KotiSivu from './pages/KotiSivu'
 import YksiSivu from './pages/YksiSivu'
+import Ruokablogi from './assets/Ruokablogi.png'
 
 // handleSearchSubmit <form onSubmit={handleSearchSubmit}>
 // const SearchForm = ({ search, handleSearchChange }) => {
@@ -231,8 +232,11 @@ function App() {
       <header className='yläpalkki'>
         <div className='logon-sijainti'>
           <div className='logo'>
-            Reseptiblogi
+            <Link to='/'>
+              <img src={Ruokablogi} alt='blogi-logo' className='blogi-logo' />
+            </Link>
           </div>
+
         </div>
 
         {errorMessage &&
