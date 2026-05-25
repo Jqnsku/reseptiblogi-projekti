@@ -53,7 +53,7 @@ const authenticateToken = (request, response, next) => {
 // })
 
 app.post('/recipes', authenticateToken, async (request, response) => {
-    const { title, description, instructions, image_url } = request.body
+    const { title, description, instructions, image_url, prep_time, cook_time, servings } = request.body
 
     if (!title || !description || !instructions) {
         return response.status(400).json({
@@ -71,7 +71,10 @@ app.post('/recipes', authenticateToken, async (request, response) => {
             description,
             instructions,
             image_url,
-            user_id
+            user_id,
+            prep_time,
+            cook_time,
+            servings
         }])
         .select('*')
 
