@@ -218,11 +218,17 @@ button:hover {
     flex-direction: column;
     justify-content: center;
     width: 800px;
-    max-width: 90%;
+    max-width: 800px;
     background: white;
     border-radius: 12px;
-    padding: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    margin: 0 auto;
+}
+
+.yksisivu img {
+    width: 100%;
+    height: auto;
+    display: block;
 }
 
 .kokoSivu {
@@ -235,4 +241,8 @@ button:hover {
     background-size: cover;
     border: none;
     border-radius: 1%;
+}
+
+.sisältö {
+    padding: 20px;
 }
