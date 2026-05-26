@@ -155,7 +155,7 @@ app.get('/comments/:id', async (request, response) => {
 })
 
 app.post('/comments', authenticateToken, async (request, response) => {
-    const { recipe_id, content } = request.body
+    const { recipe_id, content, username } = request.body
 
     if (!content) {
     return response.status(400).json({
@@ -167,7 +167,7 @@ app.post('/comments', authenticateToken, async (request, response) => {
 
     const { data, error } = await supabase
         .from('comments')
-        .insert([{ recipe_id, user_id, content }])
+        .insert([{ recipe_id, user_id, username, content }])
         .select(`
     *,
     user:user_id(username)
