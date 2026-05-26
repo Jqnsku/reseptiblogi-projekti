@@ -145,6 +145,7 @@ app.get('/comments/:id', async (request, response) => {
     *,
     user:user_id(username)
 `)
+        .eq('recipe_id', request.params.id)
 
     if (error) {
         console.error('Error fetching users:', error);
@@ -158,10 +159,10 @@ app.post('/comments', authenticateToken, async (request, response) => {
     const { recipe_id, content, username } = request.body
 
     if (!content) {
-    return response.status(400).json({
-        error: 'Comment is required'
-    })
-}
+        return response.status(400).json({
+            error: 'Comment is required'
+        })
+    }
 
     const user_id = request.user.user_id
 
@@ -214,16 +215,16 @@ app.get('/user', async (request, response) => {
 app.post('/register', async (request, response) => {
     const { username, password, email } = request.body
 
-    
+
     if (!username || !password || !email) {
         return response.status(400).json({ error: 'Missing fields' })
     }
-    
+
     if (password.length < 6) {
-    return response.status(400).json({
-        error: 'Password must be at least 6 characters'
-    })
-}
+        return response.status(400).json({
+            error: 'Password must be at least 6 characters'
+        })
+    }
     if (typeof username !== 'string' || typeof password !== 'string' || typeof email !== 'string') {
 
         return response.status(400).json({ error: 'Invalid input type' })
