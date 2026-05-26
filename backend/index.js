@@ -55,6 +55,7 @@ const authenticateToken = (request, response, next) => {
 app.post('/recipes', authenticateToken, async (request, response) => {
     const { title, category, food_type, description, ingredients, instructions, image_url, prep_time, cook_time, servings } = request.body
 
+
     if (!title || !category || !food_type || !description || !ingredients || !instructions || 
         prep_time == null || cook_time == null || servings == null) {
         return response.status(400).json({
@@ -170,7 +171,7 @@ app.post('/comments', authenticateToken, async (request, response) => {
 
     const { data, error } = await supabase
         .from('comments')
-        .insert([{ recipe_id, user_id, content }])
+        .insert([{ recipe_id, user_id, content, create_at: new Date() }])
         .select(`
     *,
     user:user_id(username)
