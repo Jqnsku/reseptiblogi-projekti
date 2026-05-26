@@ -53,9 +53,10 @@ const authenticateToken = (request, response, next) => {
 // })
 
 app.post('/recipes', authenticateToken, async (request, response) => {
-    const { title, category, food_type, description, instructions, image_url, prep_time, cook_time, servings } = request.body
+    const { title, category, food_type, description, ingredients, instructions, image_url, prep_time, cook_time, servings } = request.body
 
-    if (!title || !category || !food_type || !description || !instructions || !prep_time || !cook_time || !servings) {
+    if (!title || !category || !food_type || !description || !ingredients || !instructions || 
+        prep_time == null || cook_time == null || servings == null) {
         return response.status(400).json({
             error: 'Missing fields'
         })
@@ -71,6 +72,7 @@ app.post('/recipes', authenticateToken, async (request, response) => {
             category,
             food_type,
             description,
+            ingredients,
             instructions,
             image_url,
             user_id,
@@ -156,7 +158,7 @@ app.get('/comments/:id', async (request, response) => {
 })
 
 app.post('/comments', authenticateToken, async (request, response) => {
-    const { recipe_id, content, username } = request.body
+    const { recipe_id, content } = request.body
 
     if (!content) {
         return response.status(400).json({
@@ -168,7 +170,7 @@ app.post('/comments', authenticateToken, async (request, response) => {
 
     const { data, error } = await supabase
         .from('comments')
-        .insert([{ recipe_id, user_id, username, content }])
+        .insert([{ recipe_id, user_id, content }])
         .select(`
     *,
     user:user_id(username)
@@ -307,7 +309,7 @@ app.post('/guest', async (request, response) => {
     })
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
