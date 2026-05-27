@@ -56,7 +56,7 @@ app.post('/recipes', authenticateToken, async (request, response) => {
     const { title, description, ingredients, instructions, image_url, prep_time, cook_time, servings } = request.body
 
 
-    if (!title || !category || !food_type || !description || !ingredients || !instructions || 
+    if (!title || !description || !ingredients || !instructions || 
         prep_time == null || cook_time == null || servings == null) {
         return response.status(400).json({
             error: 'Missing fields'
