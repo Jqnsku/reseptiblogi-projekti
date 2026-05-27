@@ -8,6 +8,9 @@ function YksiSivu({ recipes, user, token }) {
 
   const recipe = recipes.find(r => String(r.recipe_id) === id)
 
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [commentToDelete, setCommentToDelete] = useState(null)
+
   const [newComment, setNewComment] = useState('')
   const [comments, setComments] = useState([])
 
@@ -55,6 +58,7 @@ function YksiSivu({ recipes, user, token }) {
   }, [])
 
   const deleteComment = (comment_id) => {
+
     axios
       .delete(`http://localhost:3001/comments/${comment_id}`,
       {
@@ -124,10 +128,10 @@ function YksiSivu({ recipes, user, token }) {
 
           <div className='resepti-kommentti'>
           </div>
+          <form onSubmit={handleAddComment} className='Kommentti-form'>
           <h2> Kommentit </h2>
 
 
-          <form onSubmit={handleAddComment} className='Kommentti-form'>
             <textarea
               value={newComment}
               onChange={(event) => setNewComment(event.target.value)}
@@ -158,15 +162,42 @@ function YksiSivu({ recipes, user, token }) {
                   </div>
 
                   {user?.username === comment.user?.username && (
-                    <button
-                      onClick={() => deleteComment(comment.comment_id, setComments)}>
+                    <button className='poista-kommentti'
+                      onClick={() => {
+                        setCommentToDelete(comment.comment_id)
+                        setShowDeleteModal(true)
+                       }}>
                       Poista kommentti
-                    </button>
+                      </button>
                   )}
-
+{/* deleteComment(comment.comment_id, setComments) */}
                 </li>
               ))}
           </ul>
+          {showDeleteModal && (
+            <div className='modal-overlay'>
+            <div className='modal'>
+
+              <h3> Poista kommentti </h3>
+
+              <p> Haluatko varmasti poistaa kommentin? </p>
+
+              <button onClick={() => {
+                deleteComment(commentToDelete)
+                setShowDeleteModal(false)
+              }}>
+                Poista
+              </button>
+
+              <button onClick={() => {
+                setShowDeleteModal(false)
+                setCommentToDelete(null)
+              }}>
+              Peruuta
+              </button>
+              </div>
+              </div>
+          )}
         </div>
       </div>
     </div>

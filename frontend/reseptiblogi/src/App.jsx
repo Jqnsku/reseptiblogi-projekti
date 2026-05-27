@@ -5,6 +5,7 @@ import KotiSivu from './pages/KotiSivu'
 import YksiSivu from './pages/YksiSivu'
 import Ruokablogi from './assets/Ruokablogi2.png'
 
+
 // handleSearchSubmit <form onSubmit={handleSearchSubmit}>
 // const SearchForm = ({ search, handleSearchChange }) => {
 //   return (
@@ -55,33 +56,44 @@ const SignupForm = ({ handleSignup, newUsername, newEmail, newPassword, handleNu
   )
 }
 
-const NewRecipeForm = ({ addRecipe, newTitle, newDescription, newIngredients, newInstructions, newImage,
-  handleTitleChange, handleDescriptionChange, handleIngredientsChange, handleInstructionChange,
-  handleImageChange
-}) => {
-  return (
-    <form onSubmit={addRecipe}>
-      <div>
-        Otsikko: <input value={newTitle} onChange={handleTitleChange} />
-      </div>
-      <div>
-        Kuvaus: <input value={newDescription} onChange={handleDescriptionChange} />
-      </div>
-      <div>
-        Ainekset: <input value={newIngredients} onChange={handleIngredientsChange} />
-      </div>
-      <div>
-        Ohjeet: <input value={newInstructions} onChange={handleIngredientsChange} />
-      </div>
-      <div>
-        Kuva: <input value={newImage} onChange={handleImageChange} />
-      </div>
-      <button type='submit'> Lisää </button>
-    </form>
-  )
-}
+// const NewRecipeForm = ({ addRecipe, newTitle, newDescription, newIngredients, newInstructions, newImage,
+//   handleTitleChange, handleDescriptionChange, handleIngredientsChange, handleInstructionChange,
+//   handleImageChange
+// }) => {
+//   return (
+//     <form onSubmit={addRecipe}>
+//       <div>
+//         Otsikko: <input value={newTitle} onChange={handleTitleChange} />
+//       </div>
+//       <div>
+//         Kuvaus: <input value={newDescription} onChange={handleDescriptionChange} />
+//       </div>
+//       <div>
+//         Ainekset: <input value={newIngredients} onChange={handleIngredientsChange} />
+//       </div>
+//       <div>
+//         Ohjeet: <input value={newInstructions} onChange={handleIngredientsChange} />
+//       </div>
+//       <div>
+//         Kuva: <input value={newImage} onChange={handleImageChange} />
+//       </div>
+//       <button type='submit'> Lisää </button>
+//     </form>
+//   )
+// }
 
 function App() {
+
+  useEffect(() => {
+    const savedToken = localStorage.getItem('token')
+    const savedUser = localStorage.getItem('user')
+
+    if (savedToken && savedUser) {
+      setToken(savedToken)
+      setUser(JSON.parse(savedUser))
+      setIsLogged(true)
+    }
+  }, [])
 
   const [recipes, setRecipes] = useState([])
 
@@ -101,15 +113,17 @@ function App() {
   const [newEmail, setNewEmail] = useState('')
   const [newPassword, setNewPassword] = useState('')
 
-  const [newTitle, setNewTitle] = useState('')
-  const [newDescription, setNewDescription] = useState('')
-  const [newIngredients, setNewIngredients] = useState('')
-  const [newInstructions, setNewInstructions] = useState('')
-  const [newImage, setNewImage] = useState('')
+  // const [newTitle, setNewTitle] = useState('')
+  // const [newDescription, setNewDescription] = useState('')
+  // const [newIngredients, setNewIngredients] = useState('')
+  // const [newInstructions, setNewInstructions] = useState('')
+  // const [newImage, setNewImage] = useState('')
 
   const [search, setSearch] = useState('')
 
   const [token, setToken] = useState(null)
+
+  // const [showRecipeForm, setShowRecipeForm] = useState(false)
 
   useEffect(() => {
     axios
@@ -120,13 +134,13 @@ function App() {
   }, [])
 
 
-  useEffect(() => {
-    axios
-      .get('http://localhost:3001/user')
-      .then(response => {
-        setUser(response.data)
-      })
-  }, [])
+  // useEffect(() => {
+  //   axios
+  //     .get('http://localhost:3001/user')
+  //     .then(response => {
+  //       setUser(response.data)
+  //     })
+  // }, [])
 
   // useEffect(() => {
   //   axios
@@ -145,12 +159,14 @@ function App() {
         password
       })
       .then(response => {
-        console.log("LOGIN RESPONSE:", response.data)
-        console.log("TOKEN:", response.data.token)
+        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
 
-        setUser(response.data.user)
+        // console.log("LOGIN RESPONSE:", response.data)
+        // console.log("TOKEN:", response.data.token)
+
         setToken(response.data.token)
-
+        setUser(response.data.user)
         setIsLogged(true)
 
         setUsername('')
@@ -173,17 +189,24 @@ function App() {
 
   const handleSignup = (event) => {
     event.preventDefault()
+
     const signupObject = { username: newUsername, email: newEmail, password: newPassword }
 
     axios
       .post('http://localhost:3001/register', signupObject)
       .then(response => {
+
+        localStorage.setItem('token', response.data.token)
+        localStorage.setItem('user', response.data.user)
+
+        setToken(response.data.token)
         setUser(response.data.user)
         setIsLogged(true)
 
         setNewUsername('')
         setNewEmail('')
         setNewPassword('')
+        setShowForm(null)
       })
   }
 
@@ -194,6 +217,10 @@ function App() {
   }
 
   const logout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+
+    setToken(null)
     setUser(null)
     setIsLogged(false)
     setShowForm(null)
@@ -206,31 +233,31 @@ function App() {
   const handleNeChange = (event) => setNewEmail(event.target.value)
   const handleNpChange = (event) => setNewPassword(event.target.value)
 
-  const handleTitleChange = (event) => setNewTitle(event.target.value)
-  const handleDescriptionChange = (event) => setNewDescription(event.target.value)
-  const handleIngredientsChange = (event) => setNewIngredients(event.target.value)
-  const handleInstructionChange = (event) => setNewInstructions(event.target.value)
-  const handleImageChange = (event) => setNewImage(event.target.value)
+  // const handleTitleChange = (event) => setNewTitle(event.target.value)
+  // const handleDescriptionChange = (event) => setNewDescription(event.target.value)
+  // const handleIngredientsChange = (event) => setNewIngredients(event.target.value)
+  // const handleInstructionChange = (event) => setNewInstructions(event.target.value)
+  // const handleImageChange = (event) => setNewImage(event.target.value)
 
-  const addRecipe = (event) => {
-    event.preventDefault()
-    const newRecipeObject = {
-      title: newTitle, description: newDescription,
-      ingredients: newIngredients, instructions: newInstructions, image_url: newImage
-    }
+  // const addRecipe = (event) => {
+  //   event.preventDefault()
+  //   const newRecipeObject = {
+  //     title: newTitle, description: newDescription,
+  //     ingredients: newIngredients, instructions: newInstructions, image_url: newImage
+  //   }
 
 
-    axios
-      .post('http://localhost:3001/recipe', newRecipeObject)
-      .then(response => {
-        setRecipes(prev => [...prev, response.data])
-        setNewTitle('')
-        setNewDescription('')
-        setNewIngredients('')
-        setNewInstructions('')
-        setNewImage('')
-      })
-  }
+  //   axios
+  //     .post('http://localhost:3001/recipe', newRecipeObject)
+  //     .then(response => {
+  //       setRecipes(prev => [...prev, response.data])
+  //       setNewTitle('')
+  //       setNewDescription('')
+  //       setNewIngredients('')
+  //       setNewInstructions('')
+  //       setNewImage('')
+  //     })
+  // }
 
   return (
     <div className='sivu'>
@@ -261,18 +288,29 @@ function App() {
               </button>
             </div>
           ) : (
-            <div className='käyttäjä'>
-              <h2> Tervetuloa {user?.username} </h2>
+            user && (
+              <div className='käyttäjä'>
+                <h2> Tervetuloa {user.username} </h2>
 
-              <button onClick={logout}>
-                Kirjaudu ulos
-              </button>
-            </div>
+                <button onClick={logout}>
+                  Kirjaudu ulos
+                </button>
+              </div>
+            )
           )}
         </div>
       </header>
 
-      {isLogged && (
+      {/* <div className='uusi-resepti'>
+        <p> Lisää uusi resepti </p>
+
+        <button className='resepti-nappi'
+          onClick={() => setShowRecipeForm(!showRecipeForm)}>
+          +
+        </button>
+      </div> */}
+
+      {/* {showRecipeForm && (
         <>
           <h4> Lisää uusi resepti </h4>
           <NewRecipeForm
@@ -289,7 +327,7 @@ function App() {
             handleImageChange={handleImageChange}
           />
         </>
-      )}
+      )} */}
 
       {!isLogged && showForm && (
         <div className='modal-overlay' onClick={() => setShowForm(null)}>
