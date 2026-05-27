@@ -5,6 +5,8 @@
 ol {
     padding-left: 0;
     margin-left: 0;
+    border-bottom: 1px solid #DDD;
+    padding-bottom: 20px;
 }
 
 .yläpalkki {
@@ -269,6 +271,8 @@ h1 {
 .reseptiInfo {
     display: flex;
     gap: 20px;
+    border-bottom: 1px solid #DDD;
+    padding-bottom: 20px;
     /* flex-wrap: wrap; */
 }
 
@@ -347,6 +351,17 @@ a {
     cursor: pointer;
 }
 
+.poista-kommentti {
+    margin-top: 10px;
+    width: fit-content;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: none;
+    background-color: #333;
+    color: white;
+    cursor: pointer;
+}
+
 .kommentti-header {
     display: flex;
     gap: 10px;
@@ -394,4 +409,16 @@ ul {
 
 li {
     list-style: none;
+}
+
+.uusi-resepti {
+   display: flex;
+   align-items: center;
+   gap: 10px;
+}
+
+.haku-lisäys {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
