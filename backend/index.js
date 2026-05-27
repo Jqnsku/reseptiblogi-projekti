@@ -53,7 +53,7 @@ const authenticateToken = (request, response, next) => {
 // })
 
 app.post('/recipes', authenticateToken, async (request, response) => {
-    const { title, category, food_type, description, ingredients, instructions, image_url, prep_time, cook_time, servings } = request.body
+    const { title, description, ingredients, instructions, image_url, prep_time, cook_time, servings } = request.body
 
 
     if (!title || !category || !food_type || !description || !ingredients || !instructions || 
@@ -70,8 +70,6 @@ app.post('/recipes', authenticateToken, async (request, response) => {
         .from('recipes')
         .insert([{
             title,
-            category,
-            food_type,
             description,
             ingredients,
             instructions,
