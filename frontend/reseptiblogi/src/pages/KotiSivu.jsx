@@ -41,6 +41,20 @@ function KotiSivu({ recipes = [] }) {
                                 <p className='otsikko'> {recipe.title}</p>
                                 <p className='kuvaus'> {recipe.description}</p>
                             </div>
+
+
+                            <div className='reseptiInfo'>
+                                <div className='info'>
+                                    <div className='tieto'> Valmisteluaika </div>
+                                    <div className='määrä'> {recipe.prep_time} minuuttia </div>
+                                </div>
+
+                                <div className='info'>
+                                    <div className='tieto'> Annosta </div>
+                                    <div className='määrä'> {recipe.servings} </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 ))}
