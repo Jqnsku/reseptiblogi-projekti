@@ -185,6 +185,39 @@ app.post('/comments', authenticateToken, async (request, response) => {
     response.json(data);
 })
 
+app.delete('/comments/:comment_id', authenticateToken, async (request, response) => {
+    const { comment_id } = request.params
+
+    const { data: comment, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('comment_id', comment_id)
+        .single()
+
+    if (error || !comment) {
+        return response.status(400).json({ error: 'Comment not found' });
+    }
+
+    if (comment.user_id !== request.user.user_id) {
+        return response.status(403).json({
+            error: 'Not allowed'
+        })
+    }
+
+    const { error: deleteError } = await supabase
+        .from('comments')
+        .delete()
+        .eq('comment_id', comment_id)
+
+        if (deleteError) {
+            return response.status(500).json({
+                error: 'Database error'
+            })
+        }
+
+    response.status(204).end();
+})
+
 // app.post('/comments', async (request, response) => {
 //     const { recipe_id, user_id, content } = request.params
 
