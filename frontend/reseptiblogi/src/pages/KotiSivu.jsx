@@ -1,9 +1,11 @@
 import { use, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import { supabase } from '../supabaseClient'
 
-const NewRecipeForm = ({ addRecipe, newTitle, newDescription, newIngredients, newInstructions, newImage,
+const NewRecipeForm = ({ addRecipe, newTitle, newDescription, newIngredients, newInstructions, imageUrl,
     handleTitleChange, handleDescriptionChange, handleIngredientsChange, handleInstructionChange,
-    handleImageChange
+    handleImageUpload
 }) => {
     return (
         <form onSubmit={addRecipe}>
@@ -20,14 +22,14 @@ const NewRecipeForm = ({ addRecipe, newTitle, newDescription, newIngredients, ne
                 Ohjeet: <input value={newInstructions} onChange={handleInstructionChange} />
             </div>
             <div>
-                Kuva: <input value={newImage} onChange={handleImageChange} />
+                Kuva: <input type='file' accept='image/*' onChange={handleImageUpload} />
             </div>
             <button type='submit'> Lisää </button>
         </form>
     )
 }
 
-function KotiSivu({ recipes = [] }) {
+function KotiSivu({ recipes = [], user, isLogged }) {
 
     const [showRecipeForm, setShowRecipeForm] = useState(false)
     const [showRecipeModal, setShowRecipeModal] = useState(false)
@@ -37,8 +39,9 @@ function KotiSivu({ recipes = [] }) {
     const [newDescription, setNewDescription] = useState('')
     const [newIngredients, setNewIngredients] = useState('')
     const [newInstructions, setNewInstructions] = useState('')
-    const [newImage, setNewImage] = useState('')
+    // const [newImage, setNewImage] = useState('')
 
+    const [imageUrl, setImageUrl] = useState('')
 
     const navigate = useNavigate()
 
@@ -46,7 +49,7 @@ function KotiSivu({ recipes = [] }) {
     const handleDescriptionChange = (event) => setNewDescription(event.target.value)
     const handleIngredientsChange = (event) => setNewIngredients(event.target.value)
     const handleInstructionChange = (event) => setNewInstructions(event.target.value)
-    const handleImageChange = (event) => setNewImage(event.target.value)
+    // const handleImageChange = (event) => setNewImage(event.target.value)
 
     const filtered = recipes.filter(recipe =>
         recipe.title?.toLowerCase().includes(search.toLowerCase())
@@ -56,7 +59,7 @@ function KotiSivu({ recipes = [] }) {
         event.preventDefault()
         const newRecipeObject = {
             title: newTitle, description: newDescription,
-            ingredients: newIngredients, instructions: newInstructions, image_url: newImage
+            ingredients: newIngredients, instructions: newInstructions, image_url: imageUrl
         }
 
 
@@ -68,8 +71,26 @@ function KotiSivu({ recipes = [] }) {
                 setNewDescription('')
                 setNewIngredients('')
                 setNewInstructions('')
-                setNewImage('')
+                imageUrl('')
             })
+    }
+
+    const handleImageUpload = async (event) => {
+        const file = event.target.files[0]
+
+        if (!file) return
+
+        const fileName = Date.now() + file.name
+
+        await supabase.storage
+            .from('recipe_images')
+            .upload(fileName, file)
+
+        const { data } = supabase.storage
+            .from('recipe_images')
+            .getPublicUrl(fileName)
+
+        setImageUrl(data.publicUrl)
     }
 
     return (
@@ -86,40 +107,41 @@ function KotiSivu({ recipes = [] }) {
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder='Hae resepti nimellä...'
                 />
+                {isLogged &&
+                    <div className='uusi-resepti'>
+                        <p> Lisää uusi resepti </p>
 
-                <div className='uusi-resepti'>
-                    <p> Lisää uusi resepti </p>
-
-                    <button className='resepti-nappi'
-                        onClick={() => setShowRecipeModal(true)}>
-                        +
-                    </button>
-                </div>
+                        <button className='resepti-nappi'
+                            onClick={() => setShowRecipeModal(true)}>
+                            +
+                        </button>
+                    </div>
+                }
             </div>
 
-            {showRecipeModal && (
+            {isLogged && showRecipeModal && (
                 <div className='modal-overlay' onClick={() => setShowRecipeModal(false)} >
                     <div className='modal' onClick={(event) => event.stopPropagation()} >
 
-                    <div className='modal-header'>
-                    <h2> Lisää resepti</h2>
-                    <button onClick={() => setShowRecipeModal(false)}> X </button>
+                        <div className='modal-header'>
+                            <h2> Lisää resepti</h2>
+                            <button onClick={() => setShowRecipeModal(false)}> X </button>
+                        </div>
+
+                        <NewRecipeForm
+                            addRecipe={addRecipe}
+                            newTitle={newTitle}
+                            newDescription={newDescription}
+                            newIngredients={newIngredients}
+                            newInstructions={newInstructions}
+                            imageUrl={imageUrl}
+                            handleTitleChange={handleTitleChange}
+                            handleDescriptionChange={handleDescriptionChange}
+                            handleIngredientsChange={handleIngredientsChange}
+                            handleInstructionChange={handleInstructionChange}
+                            handleImageUpload={handleImageUpload}
+                        />
                     </div>
-               
-                    <NewRecipeForm
-                        addRecipe={addRecipe}
-                        newTitle={newTitle}
-                        newDescription={newDescription}
-                        newIngredients={newIngredients}
-                        newInstructions={newInstructions}
-                        newImage={newImage}
-                        handleTitleChange={handleTitleChange}
-                        handleDescriptionChange={handleDescriptionChange}
-                        handleIngredientsChange={handleIngredientsChange}
-                        handleInstructionChange={handleInstructionChange}
-                        handleImageChange={handleImageChange}
-                    />
-                </div>
                 </div>
             )}
 
