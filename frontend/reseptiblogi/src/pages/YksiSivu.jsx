@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Link, useParams } from 'react-router-dom'
 import nuoli from '../assets/nuoli.svg'
 
-function YksiSivu({ recipes }) {
+function YksiSivu({ recipes, user, token }) {
   const { id } = useParams()
 
   const recipe = recipes.find(r => String(r.recipe_id) === id)
@@ -14,16 +14,36 @@ function YksiSivu({ recipes }) {
   const handleAddComment = (event) => {
     event.preventDefault()
 
+    console.log("SUBMIT FIRED")
+    console.log("TOKEN:", token)
+    console.log("ID:", id)
+    console.log("COMMENT:", newComment)
+
+    if (!token) {
+      console.log("Ei tokenia → kirjaudu sisään")
+      return
+    }
+
     axios
-    .post('http://localhost:3001/comments', {
-      content: newComment,
-      recipe_id: id,
-      username: user.username
-    })
-    .then(response => {
-      setComments([...comments, response.data])
-      setNewComment('')
-    })
+      .post('http://localhost:3001/comments', {
+        content: newComment,
+        recipe_id: Number(id),
+      },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      .then(response => {
+        setComments(prev => [...prev, response.data[0]])
+        setNewComment('')
+      })
+      .catch(error => {
+        console.log("POST FAILED")
+        console.log(error.response?.status)
+        console.log(error.response?.data)
+      })
   }
 
   useEffect(() => {
@@ -34,13 +54,30 @@ function YksiSivu({ recipes }) {
       })
   }, [])
 
+  const deleteComment = (comment_id) => {
+    axios
+      .delete(`http://localhost:3001/comments/${comment_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
+        .then(() => {
+          setComments(prev => prev.filter(comment => comment.comment_id !== comment_id))
+        })
+        .catch(error => {
+          console.log(error.response?.data)
+        })
+  }
+
   if (!recipe) return <p> Ladataan... </p>
 
   return (
     <div className='kokoSivu'>
       <div className='takaisin-nappi'>
         <Link to='/'>
-        <img src={nuoli} alt='takaisin' className='nuoli-icon' />
+          <img src={nuoli} alt='takaisin' className='nuoli-icon' />
           Takaisin resepteihin
         </Link>
       </div>
@@ -49,7 +86,7 @@ function YksiSivu({ recipes }) {
 
         <img src={recipe.image_url}></img>
 
-        <div className='sisältö'>
+        <div className='resepti-sisältö'>
           <h1> {recipe.title} </h1>
           <p> {recipe.description} </p>
 
@@ -61,7 +98,7 @@ function YksiSivu({ recipes }) {
             </div>
 
             <div className='info'>
-            <div className='tieto'> Kypsennysaika </div>
+              <div className='tieto'> Kypsennysaika </div>
               <div className='määrä'> {recipe.cook_time} minuuttia </div>
             </div>
 
@@ -85,28 +122,56 @@ function YksiSivu({ recipes }) {
             ))}
           </ol>
 
+          <div className='resepti-kommentti'>
+          </div>
           <h2> Kommentit </h2>
 
-          {comments
-            .filter(comment => String(comment.recipe_id) === id)
-            .map((comment, index) => (
-              <li key={index}>
-               <p> {comment.username} </p>: {comment.content}
-              </li>
-            ))}
-        </div>
 
           <form onSubmit={handleAddComment} className='Kommentti-form'>
-            <textarea 
-            value={newComment}
-            onChange={(event) => setNewComment(event.target.value)}
-            placeholder='Kirjoita kommentti...'
+            <textarea
+              value={newComment}
+              onChange={(event) => setNewComment(event.target.value)}
+              placeholder='Kirjoita kommentti...'
             />
-            <button type='submit'> Lähetä </button>
+            <button type='submit'> Lähetä kommentti </button>
           </form>
 
+          <ul className='kommenttilista'>
+            {comments
+              .filter(comment => String(comment.recipe_id) === id)
+
+              .map(comment => (
+                <li className='kommentti' key={comment.comment_id}>
+
+                  <div className='kommentti-header'>
+                    <span className='kommentti-käyttäjä'>
+                      {comment.user?.username}
+                    </span>
+
+                    <span className='kommentti-pv'>
+                      {new Date(comment.created_at).toLocaleDateString('fi-FI')}
+                    </span>
+                  </div>
+
+                  <div className='kommentti-sisältö'>
+                    {comment.content}
+                  </div>
+
+                  {user?.username === comment.user?.username && (
+                    <button
+                      onClick={() => deleteComment(comment.comment_id, setComments)}>
+                      Poista kommentti
+                    </button>
+                  )}
+
+                </li>
+              ))}
+          </ul>
+        </div>
       </div>
     </div>
+    // className='kommentti-kontentti'
   )
 }
+
 export default YksiSivu

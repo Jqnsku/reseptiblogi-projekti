@@ -3,7 +3,7 @@ import axios from 'axios'
 import { Routes, Route, useNavigate, useParams, Link } from 'react-router-dom'
 import KotiSivu from './pages/KotiSivu'
 import YksiSivu from './pages/YksiSivu'
-import Ruokablogi from './assets/Ruokablogi.png'
+import Ruokablogi from './assets/Ruokablogi2.png'
 
 // handleSearchSubmit <form onSubmit={handleSearchSubmit}>
 // const SearchForm = ({ search, handleSearchChange }) => {
@@ -109,6 +109,8 @@ function App() {
 
   const [search, setSearch] = useState('')
 
+  const [token, setToken] = useState(null)
+
   useEffect(() => {
     axios
       .get('http://localhost:3001/recipes')
@@ -143,7 +145,11 @@ function App() {
         password
       })
       .then(response => {
+        console.log("LOGIN RESPONSE:", response.data)
+        console.log("TOKEN:", response.data.token)
+
         setUser(response.data.user)
+        setToken(response.data.token)
 
         setIsLogged(true)
 
@@ -335,7 +341,7 @@ function App() {
           element={<KotiSivu recipes={recipes} />} />
 
         <Route path='/recipe/:id'
-          element={<YksiSivu recipes={recipes} />} />
+          element={<YksiSivu recipes={recipes} user={user} token={token} />} />
       </Routes>
 
     </div>
