@@ -259,6 +259,7 @@ app.delete('/comments/:comment_id', authenticateToken, async (request, response)
 //     response.json(data);
 // })
 
+
 app.get('/user', async (request, response) => {
 
     const { data, error } = await supabase
