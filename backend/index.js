@@ -13,27 +13,45 @@ app.use(cors())
 if (!process.env.SECRET) {
     throw new Error('SECRET missing')
 }
+console.log("SECRET:", process.env.SECRET)
 
 const authenticateToken = (request, response, next) => {
     const authHeader = request.headers.authorization
 
-    if (!authHeader) {
+    console.log("AUTH HEADER:", authHeader)
+
+    if (!authHeader || !authHeader.startsWith(`Bearer `)) {
         return response.status(401).json({
-            error: 'Voit kommentoida kirjautumalla sisään'
+            error: 'Missing or invalid token'
+            //  'Voit kommentoida kirjautumalla sisään'
         })
     }
 
     const token = authHeader.split(' ')[1]
 
-    jwt.verify(token, process.env.SECRET, (error, user) => {
-        if (error) {
-            return response.status(403).json({
-                error: 'Invalid token'
-            })
-        }
-        request.user = user
+    try {
+        const decoded = jwt.verify(token, process.env.SECRET)
+
+        console.log("DECODED", decoded)
+
+        request.user = decoded
         next()
-    })
+    } catch (error) {
+        console.log("JWT ERROR:", error.message)
+
+        return response.status(403).json({ error: 'invalid token' })
+    }
+
+
+    // jwt.verify(token, process.env.SECRET, (error, user) => {
+    //     if (error) {
+    //         return response.status(403).json({
+    //             error: 'Invalid token'
+    //         })
+    //     }
+    //     request.user = user
+    //     next()
+    // })
 }
 
 // app.get('/recipes/:title', async (request, response) => {
@@ -53,15 +71,22 @@ const authenticateToken = (request, response, next) => {
 // })
 
 app.post('/recipes', authenticateToken, async (request, response) => {
-    const { title, description, ingredients, instructions, image_url, prep_time, cook_time, servings } = request.body
+    const { title, description, ingredients, instructions, image_url, prep_time,
+        cook_time, servings, category, food_type } = request.body
 
-
-    if (!title || !description || !ingredients || !instructions || 
-        prep_time == null || cook_time == null || servings == null) {
-        return response.status(400).json({
-            error: 'Missing fields'
-        })
-    }
+    if (!title) return response.status(400).json({ error: "title missing" })
+    if (!description) return res.status(400).json({ error: "description missing" })
+    if (!ingredients) return res.status(400).json({ error: "ingredients missing" })
+    if (!instructions) return res.status(400).json({ error: "instructions missing" })
+    if (!image_url) return response.status(400).json({ error: "image missing" })
+    if (!category) return response.status(400).json({ error: "category missing" })
+    if (!food_type) return response.status(400).json({ error: "food type missing" })
+    // if (!title || !description || !ingredients || !instructions || image_url ||
+    //     prep_time == null || cook_time == null || servings == null) {
+    //     return response.status(400).json({
+    //         error: 'Missing fields'
+    //     })
+    // }
 
 
     const user_id = request.user.user_id
@@ -77,9 +102,12 @@ app.post('/recipes', authenticateToken, async (request, response) => {
             user_id,
             prep_time,
             cook_time,
-            servings
+            servings,
+            category,
+            food_type
         }])
         .select('*')
+        .single()
 
     if (error) {
         console.error('Error adding recipes:', error);
@@ -159,6 +187,8 @@ app.get('/comments/:id', async (request, response) => {
 app.post('/comments', authenticateToken, async (request, response) => {
     const { recipe_id, content } = request.body
 
+    console.log("AUTH HEADER:", request.headers.authorization)
+
     if (!content) {
         return response.status(400).json({
             error: 'Comment is required'
@@ -207,11 +237,11 @@ app.delete('/comments/:comment_id', authenticateToken, async (request, response)
         .delete()
         .eq('comment_id', comment_id)
 
-        if (deleteError) {
-            return response.status(500).json({
-                error: 'Database error'
-            })
-        }
+    if (deleteError) {
+        return response.status(500).json({
+            error: 'Database error'
+        })
+    }
 
     response.status(204).end();
 })

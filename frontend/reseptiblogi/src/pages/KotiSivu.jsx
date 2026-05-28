@@ -1,16 +1,17 @@
-import { use, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { supabase } from '../supabaseClient'
 
 const NewRecipeForm = ({ addRecipe, newTitle, newDescription, newIngredients, newInstructions, imageUrl,
-    handleTitleChange, handleDescriptionChange, handleIngredientsChange, handleInstructionChange,
-    handleImageUpload
+    newPrepTime, newCookTime, newCategory, newFoodType, newServings, handleTitleChange, handleDescriptionChange,
+    handleIngredientsChange, handleInstructionChange, handleImageUpload, handlePrepTimeChange,
+    handleCookTimeChange, handleServingsChange, handleCategoryChange, handleFoodTypeChange
 }) => {
     return (
         <form onSubmit={addRecipe}>
             <div>
-                Otsikko: <input value={newTitle} onChange={handleTitleChange} />
+                Reseptin nimi: <input value={newTitle} onChange={handleTitleChange} />
             </div>
             <div>
                 Kuvaus: <input value={newDescription} onChange={handleDescriptionChange} />
@@ -22,14 +23,29 @@ const NewRecipeForm = ({ addRecipe, newTitle, newDescription, newIngredients, ne
                 Ohjeet: <input value={newInstructions} onChange={handleInstructionChange} />
             </div>
             <div>
+                Valmisteluaika: <input value={newPrepTime} onChange={handlePrepTimeChange} />
+            </div>
+            <div>
+                Kokkausaika: <input value={newCookTime} onChange={handleCookTimeChange} />
+            </div>
+            <div>
+                Annokset: <input value={newServings} onChange={handleServingsChange} />
+            </div>
+            <div>
                 Kuva: <input type='file' accept='image/*' onChange={handleImageUpload} />
+            </div>
+            <div>
+                Kategoria: <input value={newCategory} onChange={handleCategoryChange} />
+            </div>
+            <div>
+                Ruoantyyppi: <input value={newFoodType} onChange={handleFoodTypeChange} />
             </div>
             <button type='submit'> Lisää </button>
         </form>
     )
 }
 
-function KotiSivu({ recipes = [], user, isLogged }) {
+function KotiSivu({ recipes = [], setRecipes, user, isLogged, token }) {
 
     const [showRecipeForm, setShowRecipeForm] = useState(false)
     const [showRecipeModal, setShowRecipeModal] = useState(false)
@@ -39,9 +55,17 @@ function KotiSivu({ recipes = [], user, isLogged }) {
     const [newDescription, setNewDescription] = useState('')
     const [newIngredients, setNewIngredients] = useState('')
     const [newInstructions, setNewInstructions] = useState('')
-    // const [newImage, setNewImage] = useState('')
+
+    const [newPrepTime, setNewPrepTime] = useState('')
+    const [newCookTime, setNewCookTime] = useState('')
+    const [newServings, setNewServings] = useState('')
+
+    const [newCategory, setNewCategory] = useState('')
+    const [newFoodType, setNewFoodType] = useState('')
 
     const [imageUrl, setImageUrl] = useState('')
+
+    const [error, setError] = useState(null)
 
     const navigate = useNavigate()
 
@@ -49,30 +73,100 @@ function KotiSivu({ recipes = [], user, isLogged }) {
     const handleDescriptionChange = (event) => setNewDescription(event.target.value)
     const handleIngredientsChange = (event) => setNewIngredients(event.target.value)
     const handleInstructionChange = (event) => setNewInstructions(event.target.value)
+    const handlePrepTimeChange = (event) => setNewPrepTime(event.target.value)
+    const handleCookTimeChange = (event) => setNewCookTime(event.target.value)
+    const handleServingsChange = (event) => setNewServings(event.target.value)
+    const handleCategoryChange = (event) => setNewCategory(event.target.value)
+    const handleFoodTypeChange = (event) => setNewFoodType(event.target.value)
     // const handleImageChange = (event) => setNewImage(event.target.value)
 
     const filtered = recipes.filter(recipe =>
         recipe.title?.toLowerCase().includes(search.toLowerCase())
     )
 
-    const addRecipe = (event) => {
+    const addRecipe = async (event) => {
         event.preventDefault()
+
         const newRecipeObject = {
-            title: newTitle, description: newDescription,
-            ingredients: newIngredients, instructions: newInstructions, image_url: imageUrl
+            title: newTitle,
+            description: newDescription,
+            ingredients: newIngredients,
+            instructions: newInstructions,
+            image_url: imageUrl,
+            prep_time: Number(newPrepTime),
+            cook_time: Number(newCookTime),
+            servings: Number(newServings),
+            category: newCategory,
+            food_type: newFoodType
         }
 
+        if (
+            !newTitle ||
+            !newDescription ||
+            !newIngredients ||
+            !newInstructions ||
+            newPrepTime === '' ||
+            newCookTime === '' ||
+            newServings === ''
+        ) {
+            alert("Täytä kaikki kentät")
+            return
+        }
 
-        axios
-            .post('http://localhost:3001/recipe', newRecipeObject)
-            .then(response => {
-                setRecipes(prev => [...prev, response.data])
-                setNewTitle('')
-                setNewDescription('')
-                setNewIngredients('')
-                setNewInstructions('')
-                imageUrl('')
-            })
+        console.log("TOKEN:", token)
+        console.log("SEND:", newRecipeObject)
+
+        console.log({
+            newTitle,
+            newDescription,
+            newIngredients,
+            newInstructions,
+            newPrepTime,
+            newCookTime,
+            newServings,
+            newCategory,
+            newFoodType
+        })
+
+        try {
+            const response = await axios.post(
+                'http://localhost:3001/recipes',
+                newRecipeObject,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
+
+            const updated = await axios.get('http://localhost:3001/recipes')
+            setRecipes(updated.data)
+            
+            setShowRecipeModal(false)
+            // .then(response => {
+            // })
+            setRecipes(prev => [...prev, response.data])
+
+            setNewTitle('')
+            setNewDescription('')
+            setNewIngredients('')
+            setNewInstructions('')
+            setNewPrepTime('')
+            setNewCookTime('')
+            setNewServings('')
+            setImageUrl('')
+            setNewCategory('')
+            setNewFoodType('')
+
+            setShowRecipeModal(false)
+            alert("Resepti lisätty!")
+
+        } catch (error) {
+            console.log("ADD RECIPE ERROR:", error.response?.data)
+            setError(error.response?.data?.error || "Tallennus epäonnistui")
+        } finally {
+            setShowRecipeModal(false)
+        }
     }
 
     const handleImageUpload = async (event) => {
@@ -80,17 +174,26 @@ function KotiSivu({ recipes = [], user, isLogged }) {
 
         if (!file) return
 
-        const fileName = Date.now() + file.name
+        const fileName = `${Date.now()}-${file.name}`
 
-        await supabase.storage
+        const { data, error } = await supabase.storage
             .from('recipe_images')
             .upload(fileName, file)
 
-        const { data } = supabase.storage
+        console.log("DATA:", data)
+        console.log("ERROR:", error)
+
+
+        if (error) {
+            console.error("UPLOAD ERROR:", error)
+            return
+        }
+
+        const { data: urlData } = supabase.storage
             .from('recipe_images')
             .getPublicUrl(fileName)
 
-        setImageUrl(data.publicUrl)
+        setImageUrl(urlData.publicUrl)
     }
 
     return (
@@ -120,26 +223,46 @@ function KotiSivu({ recipes = [], user, isLogged }) {
             </div>
 
             {isLogged && showRecipeModal && (
-                <div className='modal-overlay' onClick={() => setShowRecipeModal(false)} >
-                    <div className='modal' onClick={(event) => event.stopPropagation()} >
+                <div className='resepti-modal-overlay' onClick={() => setShowRecipeModal(false)} >
+                    <div className='resepti-modal' onClick={(event) => event.stopPropagation()} >
 
-                        <div className='modal-header'>
+                        <div className='resepti-modal-header'>
                             <h2> Lisää resepti</h2>
                             <button onClick={() => setShowRecipeModal(false)}> X </button>
                         </div>
 
+                        {error && (
+                            <p style={{ color: "red" }}>
+                                {error}
+                            </p>
+                        )}
+
                         <NewRecipeForm
                             addRecipe={addRecipe}
+
                             newTitle={newTitle}
                             newDescription={newDescription}
                             newIngredients={newIngredients}
                             newInstructions={newInstructions}
                             imageUrl={imageUrl}
+                            newPrepTime={newPrepTime}
+                            newCookTime={newCookTime}
+                            newServings={newServings}
+                            newCategory={newCategory}
+                            newFoodType={newFoodType}
+
                             handleTitleChange={handleTitleChange}
                             handleDescriptionChange={handleDescriptionChange}
                             handleIngredientsChange={handleIngredientsChange}
                             handleInstructionChange={handleInstructionChange}
                             handleImageUpload={handleImageUpload}
+
+                            handlePrepTimeChange={handlePrepTimeChange}
+                            handleCookTimeChange={handleCookTimeChange}
+                            handleServingsChange={handleServingsChange}
+
+                            handleCategoryChange={handleCategoryChange}
+                            handleFoodTypeChange={handleFoodTypeChange}
                         />
                     </div>
                 </div>
