@@ -376,7 +376,7 @@ function App() {
 
       <Routes>
         <Route path='/'
-          element={<KotiSivu recipes={recipes} user={user} isLogged={isLogged} />} />
+          element={<KotiSivu recipes={recipes} user={user} isLogged={isLogged} token={token} />} />
 
         <Route path='/recipe/:id'
           element={<YksiSivu recipes={recipes} user={user} token={token} />} />
