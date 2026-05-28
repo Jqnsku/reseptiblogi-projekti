@@ -53,10 +53,10 @@ const authenticateToken = (request, response, next) => {
 // })
 
 app.post('/recipes', authenticateToken, async (request, response) => {
-    const { title, description, ingredients, instructions, image_url, prep_time, cook_time, servings } = request.body
+    const { title, category, food_type, description, ingredients, instructions, image_url, prep_time, cook_time, servings } = request.body
 
 
-    if (!title || !description || !ingredients || !instructions || 
+    if (!title || !category || !food_type || !description || !ingredients || !instructions || 
         prep_time == null || cook_time == null || servings == null) {
         return response.status(400).json({
             error: 'Missing fields'
@@ -70,6 +70,8 @@ app.post('/recipes', authenticateToken, async (request, response) => {
         .from('recipes')
         .insert([{
             title,
+            category,
+            food_type,
             description,
             ingredients,
             instructions,
@@ -94,6 +96,7 @@ app.get('/recipes', async (request, response) => {
     const { data, error } = await supabase
         .from('recipes')
         .select('*')
+        .order('created_at', { ascending: false })
 
     if (error) {
         console.error('Error fetching recipes:', error);
@@ -112,10 +115,11 @@ app.get('/recipe/:recipe_id', async (request, response) => {
         .eq('recipe_id', recipe_id)
         .single()
 
-    if (error) {
-        console.error('Error fetching recipes:', error);
-        return response.status(500).json({ error: 'Database error' });
-    }
+    if (error || !data) {
+    return response.status(404).json({
+        error: 'Recipe not found'
+    })
+}
 
     response.json(data);
 })
