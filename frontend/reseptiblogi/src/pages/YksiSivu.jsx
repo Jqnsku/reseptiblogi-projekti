@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Link, useParams } from 'react-router-dom'
 import nuoli from '../assets/nuoli.svg'
+import ihminen from '../assets/ihminen.svg'
+import kello from '../assets/kello.svg'
 
 function YksiSivu({ recipes, user, token }) {
   const { id } = useParams()
@@ -61,18 +63,18 @@ function YksiSivu({ recipes, user, token }) {
 
     axios
       .delete(`http://localhost:3001/comments/${comment_id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      }
-    )
-        .then(() => {
-          setComments(prev => prev.filter(comment => comment.comment_id !== comment_id))
-        })
-        .catch(error => {
-          console.log(error.response?.data)
-        })
+      )
+      .then(() => {
+        setComments(prev => prev.filter(comment => comment.comment_id !== comment_id))
+      })
+      .catch(error => {
+        console.log(error.response?.data)
+      })
   }
 
   if (!recipe) return <p> Ladataan... </p>
@@ -92,23 +94,35 @@ function YksiSivu({ recipes, user, token }) {
 
         <div className='resepti-sisältö'>
           <h1> {recipe.title} </h1>
-          <p> {recipe.description} </p>
+          <p className='yksi-kuvaus'> {recipe.description} </p>
 
           <div className='reseptiInfo'>
 
             <div className='info'>
               <div className='tieto'> Valmisteluaika </div>
-              <div className='määrä'> {recipe.prep_time} minuuttia </div>
+
+              <div className='info-rivi'>
+                <img src={kello} alt="kello" className="icon" />
+                <div className='määrä'> {recipe.prep_time} minuuttia </div>
+              </div>
             </div>
 
             <div className='info'>
               <div className='tieto'> Kypsennysaika </div>
-              <div className='määrä'> {recipe.cook_time} minuuttia </div>
+
+              <div className='info-rivi'>
+                <img src={kello} alt="kello" className="icon" />
+                <div className='määrä'> {recipe.cook_time} minuuttia </div>
+              </div>
             </div>
 
             <div className='info'>
-              <div className='tieto'> Annosta </div>
-              <div className='määrä'> {recipe.servings} </div>
+              <div className='tieto'> Annoksia </div>
+
+              <div className='info-rivi'>
+                <img src={ihminen} alt="ihminen" className="icon" />
+                <div className='määrä'> {recipe.servings} </div>
+              </div>
             </div>
           </div>
 
@@ -129,7 +143,7 @@ function YksiSivu({ recipes, user, token }) {
           <div className='resepti-kommentti'>
           </div>
           <form onSubmit={handleAddComment} className='Kommentti-form'>
-          <h2> Kommentit </h2>
+            <h2> Kommentit </h2>
 
 
             <textarea
@@ -166,37 +180,37 @@ function YksiSivu({ recipes, user, token }) {
                       onClick={() => {
                         setCommentToDelete(comment.comment_id)
                         setShowDeleteModal(true)
-                       }}>
+                      }}>
                       Poista kommentti
-                      </button>
+                    </button>
                   )}
-{/* deleteComment(comment.comment_id, setComments) */}
+                  {/* deleteComment(comment.comment_id, setComments) */}
                 </li>
               ))}
           </ul>
           {showDeleteModal && (
             <div className='modal-overlay'>
-            <div className='modal'>
+              <div className='modal'>
 
-              <h3> Poista kommentti </h3>
+                <h3> Poista kommentti </h3>
 
-              <p> Haluatko varmasti poistaa kommentin? </p>
+                <p> Haluatko varmasti poistaa kommentin? </p>
 
-              <button onClick={() => {
-                deleteComment(commentToDelete)
-                setShowDeleteModal(false)
-              }}>
-                Poista
-              </button>
+                <button onClick={() => {
+                  deleteComment(commentToDelete)
+                  setShowDeleteModal(false)
+                }}>
+                  Poista
+                </button>
 
-              <button onClick={() => {
-                setShowDeleteModal(false)
-                setCommentToDelete(null)
-              }}>
-              Peruuta
-              </button>
+                <button onClick={() => {
+                  setShowDeleteModal(false)
+                  setCommentToDelete(null)
+                }}>
+                  Peruuta
+                </button>
               </div>
-              </div>
+            </div>
           )}
         </div>
       </div>

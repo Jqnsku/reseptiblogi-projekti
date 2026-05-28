@@ -82,6 +82,8 @@ ol {
     flex-direction: row;
     height: 150px;
     width: 200px; */
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
     width: 100%;
     height: 200px;
     object-fit: cover;
@@ -91,7 +93,7 @@ ol {
     font-weight: bold;
 }
 
-.otsikkoKuvaus {
+.otsikko-kuvaus {
     display: flex;
     flex-direction: column;
     padding: 10px;
@@ -205,7 +207,7 @@ button:hover {
     flex-direction: row;
     flex: 1 1 250px; */
     border: 1px solid #CCC;
-    padding: 10px;
+    /* padding: 10px; */
     cursor: pointer;
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -272,12 +274,20 @@ h1 {
 
 /* width: 100%; */
 
-.reseptiInfo {
+.resepti-info {
     display: flex;
+    align-items: center;
     gap: 20px;
     padding-bottom: 20px;
     color: rgb(100, 100, 100);
+
     /* flex-wrap: wrap; */
+}
+
+.kortti-tieto {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .yksisivu .reseptiInfo {
@@ -286,17 +296,38 @@ h1 {
 
 .info {
     display: flex;
+    /* align-items: center; */
     flex-direction: column;
+    gap: 6px;
+}
+
+.info-rivi {
+    display: flex;
     align-items: center;
+    gap: 6px;
+}
+
+.icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+}
+
+.yksi-kuvaus {
+    color: rgb(100, 100, 100);
 }
 
 .tieto {
+    display: flex;
     font-size: 12px;
     color: rgb(100, 100, 100);
+    align-items: center;
+    gap: 6px;
 }
 
 .määrä {
     font-size: 16px;
+    color: black;
     /* font-weight: bold; */
 }
 
@@ -409,14 +440,22 @@ a {
     padding: 20px;
 }
 
-ul {
-    list-style: none;
+/* ul {
     padding-left: 0;
     margin-left: 0;
+} */
+
+ul,
+ol {
+    padding-left: 20px;
+    margin: 0;
 }
 
 li {
-    list-style: none;
+    white-space: normal;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .uusi-resepti {
@@ -450,7 +489,16 @@ li {
 
 .resepti-modal-overlay {
     position: fixed;
-    inset: 0;
+
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* inset: 0;
 
     background: rgba(0, 0, 0, 0.6);
 
@@ -458,22 +506,40 @@ li {
     justify-content: center;
     align-items: center;
 
-    padding: 20px;
+    padding: 20px; */
     /* 
     z-index: 1000; */
 }
 
 .resepti-modal-header {
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 10;
-    padding-bottom: 10px;
-
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    background: #f5f5f5;
+    position: sticky;
+    z-index: 10;
+    padding-bottom: 10px;
     margin-bottom: 1rem;
+
+
+    /* width: 100%;
+    top: 0;
+    background: white;
+
+ 
+    box-sizing: border-box; */
+}
+
+.uusi-kategoria {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.valitse-tyyppi {
+    padding-bottom: 20px;
 }
 
 .modal form {
@@ -486,6 +552,10 @@ li {
 .modal textarea {
     width: 100%;
     padding: 8px;
+}
+
+input {
+    cursor: text;
 }
 
 /* body {

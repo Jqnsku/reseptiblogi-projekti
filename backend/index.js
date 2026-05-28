@@ -74,7 +74,7 @@ app.post('/recipes', authenticateToken, async (request, response) => {
     const { title, category, food_type, description, ingredients, instructions, image_url, prep_time, cook_time, servings } = request.body
 
 
-    if (!title || !category || !food_type || !description || !ingredients || !instructions || 
+    if (!title || !category || !food_type || !description || !ingredients || !instructions ||
         prep_time == null || cook_time == null || servings == null) {
         return response.status(400).json({
             error: 'Missing fields'
@@ -88,8 +88,6 @@ app.post('/recipes', authenticateToken, async (request, response) => {
         .from('recipes')
         .insert([{
             title,
-            category,
-            food_type,
             description,
             ingredients,
             instructions,
@@ -137,14 +135,41 @@ app.get('/recipe/:recipe_id', async (request, response) => {
         .single()
 
     if (error || !data) {
-    return response.status(404).json({
-        error: 'Recipe not found'
-    })
-}
+        return response.status(404).json({
+            error: 'Recipe not found'
+        })
+    }
 
     response.json(data);
 })
 
+app.get('/food-types', async (req, res) => {
+    const { data, error } = await supabase
+        .from('recipes')
+        .select('food_type')
+
+    if (error) return res.status(500).json(error)
+
+    const unique = [...new Set(data
+        .map(r => r.food_type)
+        .filter(Boolean)
+        .map(type => type.toLowerCase())
+    )]
+
+    res.json(unique)
+})
+
+app.get('/categories', async (req, res) => {
+    const { data, error } = await supabase
+        .from('recipes')
+        .select('category')
+
+    if (error) return res.status(500).json(error)
+
+    const unique = [...new Set(data.map(r => r.category))]
+
+    res.json(unique)
+})
 
 app.get('/comments', async (request, response) => {
 
