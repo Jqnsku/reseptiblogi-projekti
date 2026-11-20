@@ -196,7 +196,7 @@ app.post('/comments', authenticateToken, async (request, response) => {
 
     const { data, error } = await supabase
         .from('comments')
-        .insert([{ recipe_id, user_id, content, created_at: new Date() }])
+        .insert([{ recipe_id, user_id, content, create_at: new Date() }])
         .select(`
     *,
     user:user_id(username)
