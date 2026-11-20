@@ -88,18 +88,17 @@ function App() {
     const savedToken = localStorage.getItem('token')
     const savedUser = localStorage.getItem('user')
 
-    if (savedToken && savedUser) {
+    if (savedToken && savedUser !== "undefined") {
       setToken(savedToken)
       setUser(JSON.parse(savedUser))
-      setIsLogged(true)
     }
   }, [])
 
   const [recipes, setRecipes] = useState([])
 
-  const [isLogged, setIsLogged] = useState(false)
-
   const [user, setUser] = useState(null)
+  const isLogged = Boolean(user)
+
   const [showForm, setShowForm] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
 
@@ -167,7 +166,6 @@ function App() {
 
         setToken(response.data.token)
         setUser(response.data.user)
-        setIsLogged(true)
 
         setUsername('')
         setPassword('')
@@ -197,11 +195,10 @@ function App() {
       .then(response => {
 
         localStorage.setItem('token', response.data.token)
-        localStorage.setItem('user', response.data.user)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
 
         setToken(response.data.token)
         setUser(response.data.user)
-        setIsLogged(true)
 
         setNewUsername('')
         setNewEmail('')
@@ -222,7 +219,6 @@ function App() {
 
     setToken(null)
     setUser(null)
-    setIsLogged(false)
     setShowForm(null)
   }
 
