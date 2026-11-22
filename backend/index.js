@@ -152,28 +152,42 @@ app.get('/recipe/:recipe_id', async (request, response) => {
 
 app.get('/categories', async (request, response) => {
     const { data, error } = await supabase
-        .from('categories')
-        .select('*')
+        .from('recipes')
+        .select('category')
 
     if (error) {
         console.error('Error fetching categories:', error)
-        return response.status(500).json({ error: 'Database error' })
+        return response.status(500).json({
+            error: error.message,
+            code: error.code
+        })
     }
 
-    response.json(data)
+    const categories = [
+        ...new Set(data.map(recipe => recipe.category).filter(Boolean))
+    ]
+
+    response.json(categories)
 })
 
 app.get('/food-types', async (request, response) => {
     const { data, error } = await supabase
-        .from('food_types')
-        .select('*')
+        .from('recipes')
+        .select('food_type')
 
     if (error) {
         console.error('Error fetching food types:', error)
-        return response.status(500).json({ error: 'Database error' })
+        return response.status(500).json({
+            error: error.message,
+            code: error.code
+        })
     }
 
-    response.json(data)
+    const foodTypes = [
+        ...new Set(data.map(recipe => recipe.food_type).filter(Boolean))
+    ]
+
+    response.json(foodTypes)
 })
 
 

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { Routes, Route, useNavigate, useParams, Link } from 'react-router-dom'
@@ -6,7 +7,6 @@ import YksiSivu from './pages/YksiSivu'
 import Ruokablogi from './assets/Ruokablogi2.png'
 
 const API_URL = import.meta.env.VITE_API_URL
-
 
 // handleSearchSubmit <form onSubmit={handleSearchSubmit}>
 // const SearchForm = ({ search, handleSearchChange }) => {
@@ -24,7 +24,6 @@ const LoginForm = ({ handleLogin, username, password, handleUnChange, handlePwCh
   return (
     <form onSubmit={handleLogin}>
       <div>
-
         Käyttäjänimi: <input value={username} onChange={handleUnChange} />
       </div>
       <div>
@@ -42,7 +41,6 @@ const SignupForm = ({ handleSignup, newUsername, newEmail, newPassword, handleNu
   return (
     <form onSubmit={handleSignup}>
       <div>
-
         Nimi: <input value={newUsername} onChange={handleNuChange} />
       </div>
       <div>
@@ -85,20 +83,10 @@ const SignupForm = ({ handleSignup, newUsername, newEmail, newPassword, handleNu
 // }
 
 function App() {
-
-  useEffect(() => {
-    const savedToken = localStorage.getItem('token')
-    const savedUser = localStorage.getItem('user')
-
-    if (savedToken && savedUser !== "undefined") {
-      setToken(savedToken)
-      setUser(JSON.parse(savedUser))
-    }
-  }, [])
-
   const [recipes, setRecipes] = useState([])
-
   const [user, setUser] = useState(null)
+  const [token, setToken] = useState(null)
+
   const isLogged = Boolean(user)
 
   const [showForm, setShowForm] = useState(null)
@@ -108,58 +96,49 @@ function App() {
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  // const [email, setEmail] = useState('')
 
   const [newUsername, setNewUsername] = useState('')
   const [newEmail, setNewEmail] = useState('')
   const [newPassword, setNewPassword] = useState('')
 
-  // const [newTitle, setNewTitle] = useState('')
-  // const [newDescription, setNewDescription] = useState('')
-  // const [newIngredients, setNewIngredients] = useState('')
-  // const [newInstructions, setNewInstructions] = useState('')
-  // const [newImage, setNewImage] = useState('')
-
   const [search, setSearch] = useState('')
 
-  const [token, setToken] = useState(null)
+  // Haetaan tallennettu kirjautuminen
+  useEffect(() => {
+    const savedToken = localStorage.getItem('token')
+    const savedUser = localStorage.getItem('user')
 
-  // const [showRecipeForm, setShowRecipeForm] = useState(false)
+    if (savedToken && savedUser && savedUser !== "undefined") {
+      try {
+        setToken(savedToken)
+        setUser(JSON.parse(savedUser))
+      } catch (error) {
+        console.error('Tallennetun käyttäjän lukeminen epäonnistui:', error)
+        localStorage.removeItem('token')
+        localStorage.removeItem('user')
+      }
+    }
+  }, [])
 
-  // useEffect(() => {
-  //   axios
-  //     .get('http://localhost:3001/recipes')
-  //     .then(response => {
-  //       setRecipes(response.data)
-  //     })
-  // }, [])
+  // Haetaan reseptit
+  useEffect(() => {
+    axios.get(`${API_URL}/recipes`)
+      .then(response => {
+        setRecipes(response.data)
+      })
+      .catch(error => {
+        console.error(
+          'Reseptien haku epäonnistui:',
+          error.response?.data || error.message
+        )
+      })
+  }, [])
 
-  axios.get(`${API_URL}/recipes`)
-
-
-  // useEffect(() => {
-  //   axios
-  //     .get('http://localhost:3001/user')
-  //     .then(response => {
-  //       setUser(response.data)
-  //     })
-  // }, [])
-
-  // useEffect(() => {
-  //   axios
-  //     .get('http://localhost:3001/comments')
-  //     .then(response => {
-  //       setComments(response.data)
-  //     })
-  // }, [])
-
+  // Kirjautuminen
   const handleLogin = (event) => {
     event.preventDefault()
+    setErrorMessage(null)
 
-    // axios
-    //   .post('http://localhost:3001/login', {
-    //     username: username.trim(),
-    //     password
     axios.post(`${API_URL}/login`, {
       username: username.trim(),
       password
@@ -167,9 +146,6 @@ function App() {
       .then(response => {
         localStorage.setItem('token', response.data.token)
         localStorage.setItem('user', JSON.stringify(response.data.user))
-
-        // console.log("LOGIN RESPONSE:", response.data)
-        // console.log("TOKEN:", response.data.token)
 
         setToken(response.data.token)
         setUser(response.data.user)
@@ -180,27 +156,33 @@ function App() {
         setErrorMessage(null)
       })
       .catch(error => {
-        setErrorMessage(error.response?.data?.error)
+        const message = error.response?.data?.error
 
-        if (errorMessage === 'Password missing') {
+        if (message === 'Password missing') {
           setErrorMessage('Salasana puuttuu')
-        } else if (errorMessage === 'Username missing') {
+        } else if (message === 'Username missing') {
           setErrorMessage('Käyttäjänimi puuttuu')
-        } else if (errorMessage === 'Invalid username or password') {
+        } else if (message === 'Invalid username or password') {
           setErrorMessage('Väärä käyttäjänimi tai salasana')
+        } else {
+          setErrorMessage('Kirjautuminen epäonnistui')
         }
       })
   }
 
+  // Rekisteröityminen
   const handleSignup = (event) => {
     event.preventDefault()
+    setErrorMessage(null)
 
-    const signupObject = { username: newUsername, email: newEmail, password: newPassword }
+    const signupObject = {
+      username: newUsername,
+      email: newEmail,
+      password: newPassword
+    }
 
-      // // .post('http://localhost:3001/register', signupObject)
-      axios.post(`${API_URL}/register`, signupObject)
+    axios.post(`${API_URL}/register`, signupObject)
       .then(response => {
-
         localStorage.setItem('token', response.data.token)
         localStorage.setItem('user', JSON.stringify(response.data.user))
 
@@ -212,14 +194,14 @@ function App() {
         setNewPassword('')
         setShowForm(null)
       })
+      .catch(error => {
+        setErrorMessage(
+          error.response?.data?.error || 'Rekisteröityminen epäonnistui'
+        )
+      })
   }
 
-  const login = () => {
-    setUser({ username: username })
-    setUsername('')
-    setPassword('')
-  }
-
+  // Uloskirjautuminen
   const logout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
@@ -229,9 +211,11 @@ function App() {
     setShowForm(null)
   }
 
+  // Kirjautumislomakkeen kentät
   const handleUnChange = (event) => setUsername(event.target.value)
   const handlePwChange = (event) => setPassword(event.target.value)
 
+  // Rekisteröitymislomakkeen kentät
   const handleNuChange = (event) => setNewUsername(event.target.value)
   const handleNeChange = (event) => setNewEmail(event.target.value)
   const handleNpChange = (event) => setNewPassword(event.target.value)
@@ -248,7 +232,6 @@ function App() {
   //     title: newTitle, description: newDescription,
   //     ingredients: newIngredients, instructions: newInstructions, image_url: newImage
   //   }
-
 
   //   axios
   //     .post('http://localhost:3001/recipe', newRecipeObject)
@@ -272,16 +255,14 @@ function App() {
               <img src={Ruokablogi} alt='blogi-logo' className='blogi-logo' />
             </Link>
           </div>
-
         </div>
 
         {errorMessage &&
-          <p> {errorMessage} </p>
+          <p>{errorMessage}</p>
         }
 
         <div className='nappi-sijainti'>
           {!isLogged ? (
-
             <div className='napit'>
               <button className='ks-nappi' onClick={() => setShowForm("login")}>
                 Kirjaudu sisään
@@ -294,7 +275,6 @@ function App() {
             user && (
               <div className='käyttäjä'>
                 <h2> Tervetuloa {user.username} </h2>
-
                 <button onClick={logout}>
                   Kirjaudu ulos
                 </button>
@@ -306,35 +286,14 @@ function App() {
 
       {/* <div className='uusi-resepti'>
         <p> Lisää uusi resepti </p>
-
         <button className='resepti-nappi'
           onClick={() => setShowRecipeForm(!showRecipeForm)}>
           +
         </button>
       </div> */}
 
-      {/* {showRecipeForm && (
-        <>
-          <h4> Lisää uusi resepti </h4>
-          <NewRecipeForm
-            addRecipe={addRecipe}
-            newTitle={newTitle}
-            newDescription={newDescription}
-            newIngredients={newIngredients}
-            newInstructions={newInstructions}
-            newImage={newImage}
-            handleTitleChange={handleTitleChange}
-            handleDescriptionChange={handleDescriptionChange}
-            handleIngredientsChange={handleIngredientsChange}
-            handleInstructionChange={handleInstructionChange}
-            handleImageChange={handleImageChange}
-          />
-        </>
-      )} */}
-
       {!isLogged && showForm && (
         <div className='modal-overlay' onClick={() => setShowForm(null)}>
-
           <div className='modal' onClick={(event) => event.stopPropagation()}>
 
             <div className='modal-header'>
@@ -355,7 +314,8 @@ function App() {
                   username={username}
                   password={password}
                   handleUnChange={handleUnChange}
-                  handlePwChange={handlePwChange} />
+                  handlePwChange={handlePwChange}
+                />
               </div>
             )}
 
@@ -369,20 +329,38 @@ function App() {
                   newPassword={newPassword}
                   handleNuChange={handleNuChange}
                   handleNeChange={handleNeChange}
-                  handleNpChange={handleNpChange} />
+                  handleNpChange={handleNpChange}
+                />
               </div>
             )}
           </div>
         </div>
       )}
 
-
       <Routes>
-        <Route path='/'
-          element={<KotiSivu recipes={recipes} user={user} isLogged={isLogged} token={token} />} />
+        <Route
+          path='/'
+          element={
+            <KotiSivu
+              recipes={recipes}
+              setRecipes={setRecipes}
+              user={user}
+              isLogged={isLogged}
+              token={token}
+            />
+          }
+        />
 
-        <Route path='/recipe/:id'
-          element={<YksiSivu recipes={recipes} user={user} token={token} />} />
+        <Route
+          path='/recipe/:id'
+          element={
+            <YksiSivu
+              recipes={recipes}
+              user={user}
+              token={token}
+            />
+          }
+        />
       </Routes>
 
     </div>

@@ -5,6 +5,10 @@ import { supabase } from '../supabaseClient'
 import kello from '../assets/kello.svg'
 import ihminen from '../assets/ihminen.svg'
 
+const API_URL = (
+    import.meta.env.VITE_API_URL || 'http://localhost:3001'
+).replace(/\/+$/, '')
+
 const NewRecipeForm = ({ addRecipe,
     categories, foodTypes, newTitle,
     newDescription, newIngredients, newInstructions,
@@ -126,17 +130,31 @@ function KotiSivu({ recipes = [], setRecipes, user, isLogged, token }) {
     // const handleImageChange = (event) => setNewImage(event.target.value)
 
     useEffect(() => {
-        // axios.get('http://localhost:3001/categories') //
-        axios.get('http://localhost:3001/categories')
-            .then(res => setCategories(res.data))
-            .catch(err => console.log(err))
+        axios.get(`${API_URL}/categories`)
+            .then(res => {
+                setCategories(Array.isArray(res.data) ? res.data : [])
+            })
+            .catch(err => {
+                console.error(
+                    'Kategorioiden haku epäonnistui:',
+                    err.response?.data || err.message
+                )
+                setCategories([])
+            })
     }, [])
 
     useEffect(() => {
-        // axios.get('http://localhost:3001/food-types')
         axios.get(`${API_URL}/food-types`)
-            .then(res => setFoodTypes(res.data))
-            .catch(err => console.log(err))
+            .then(res => {
+                setFoodTypes(Array.isArray(res.data) ? res.data : [])
+            })
+            .catch(err => {
+                console.error(
+                    'Ruoantyyppien haku epäonnistui:',
+                    err.response?.data || err.message
+                )
+                setFoodTypes([])
+            })
     }, [])
 
     const handleCategoryChange = (e) => {
@@ -209,7 +227,8 @@ function KotiSivu({ recipes = [], setRecipes, user, isLogged, token }) {
 
         try {
             const response = await axios.post(
-                'http://localhost:3001/recipes',
+                // 'http://localhost:3001/recipes',
+                `${API_URL}/recipes`,
                 newRecipeObject,
                 {
                     headers: {
@@ -218,7 +237,7 @@ function KotiSivu({ recipes = [], setRecipes, user, isLogged, token }) {
                 }
             )
 
-            const updated = await axios.get('http://localhost:3001/recipes')
+            const updated = await axios.get(`${API_URL}/recipes`)
             setRecipes(updated.data)
 
             setShowRecipeModal(false)
