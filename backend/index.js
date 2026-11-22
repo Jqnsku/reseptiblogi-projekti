@@ -111,6 +111,12 @@ app.post('/recipes', authenticateToken, async (request, response) => {
     response.json(data);
 })
 
+app.get('/', (request, response) => {
+    response.json({
+        message: 'Reseptiblogi API is running!'
+    });
+});
+
 app.get('/recipes', async (request, response) => {
 
     const { data, error } = await supabase
