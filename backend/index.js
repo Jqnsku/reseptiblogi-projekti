@@ -13,7 +13,6 @@ app.use(cors())
 if (!process.env.SECRET) {
     throw new Error('SECRET missing')
 }
-console.log("SECRET:", process.env.SECRET)
 
 const authenticateToken = (request, response, next) => {
     const authHeader = request.headers.authorization
