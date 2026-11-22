@@ -126,13 +126,15 @@ function KotiSivu({ recipes = [], setRecipes, user, isLogged, token }) {
     // const handleImageChange = (event) => setNewImage(event.target.value)
 
     useEffect(() => {
+        // axios.get('http://localhost:3001/categories') //
         axios.get('http://localhost:3001/categories')
             .then(res => setCategories(res.data))
             .catch(err => console.log(err))
     }, [])
 
     useEffect(() => {
-        axios.get('http://localhost:3001/food-types')
+        // axios.get('http://localhost:3001/food-types')
+        axios.get(`${API_URL}/food-types`)
             .then(res => setFoodTypes(res.data))
             .catch(err => console.log(err))
     }, [])

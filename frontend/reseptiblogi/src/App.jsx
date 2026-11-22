@@ -5,6 +5,8 @@ import KotiSivu from './pages/KotiSivu'
 import YksiSivu from './pages/YksiSivu'
 import Ruokablogi from './assets/Ruokablogi2.png'
 
+const API_URL = import.meta.env.VITE_API_URL
+
 
 // handleSearchSubmit <form onSubmit={handleSearchSubmit}>
 // const SearchForm = ({ search, handleSearchChange }) => {
@@ -124,13 +126,15 @@ function App() {
 
   // const [showRecipeForm, setShowRecipeForm] = useState(false)
 
-  useEffect(() => {
-    axios
-      .get('http://localhost:3001/recipes')
-      .then(response => {
-        setRecipes(response.data)
-      })
-  }, [])
+  // useEffect(() => {
+  //   axios
+  //     .get('http://localhost:3001/recipes')
+  //     .then(response => {
+  //       setRecipes(response.data)
+  //     })
+  // }, [])
+
+  axios.get(`${API_URL}/recipes`)
 
 
   // useEffect(() => {
@@ -152,11 +156,14 @@ function App() {
   const handleLogin = (event) => {
     event.preventDefault()
 
-    axios
-      .post('http://localhost:3001/login', {
-        username: username.trim(),
-        password
-      })
+    // axios
+    //   .post('http://localhost:3001/login', {
+    //     username: username.trim(),
+    //     password
+    axios.post(`${API_URL}/login`, {
+      username: username.trim(),
+      password
+    })
       .then(response => {
         localStorage.setItem('token', response.data.token)
         localStorage.setItem('user', JSON.stringify(response.data.user))
@@ -190,8 +197,8 @@ function App() {
 
     const signupObject = { username: newUsername, email: newEmail, password: newPassword }
 
-    axios
-      .post('http://localhost:3001/register', signupObject)
+      // // .post('http://localhost:3001/register', signupObject)
+      axios.post(`${API_URL}/register`, signupObject)
       .then(response => {
 
         localStorage.setItem('token', response.data.token)

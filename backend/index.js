@@ -150,6 +150,32 @@ app.get('/recipe/:recipe_id', async (request, response) => {
     response.json(data);
 })
 
+app.get('/categories', async (request, response) => {
+    const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+
+    if (error) {
+        console.error('Error fetching categories:', error)
+        return response.status(500).json({ error: 'Database error' })
+    }
+
+    response.json(data)
+})
+
+app.get('/food-types', async (request, response) => {
+    const { data, error } = await supabase
+        .from('food_types')
+        .select('*')
+
+    if (error) {
+        console.error('Error fetching food types:', error)
+        return response.status(500).json({ error: 'Database error' })
+    }
+
+    response.json(data)
+})
+
 
 app.get('/comments', async (request, response) => {
 
